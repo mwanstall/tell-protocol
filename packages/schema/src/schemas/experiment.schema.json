@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://tell-protocol.org/schemas/v0.2/experiment.schema.json",
+  "$id": "https://tell-protocol.org/schemas/v0.3/experiment.schema.json",
   "title": "Experiment",
   "description": "A time-boxed, cost-capped test designed to validate or falsify a bet's thesis through targeted assumption testing.",
   "type": "object",

@@ -79,7 +79,7 @@ const commands = [
   {
     name: 'tell export',
     usage: 'tell export [-o <file>]',
-    description: 'Export the complete portfolio as a .tell.json file. Defaults to portfolio.tell.json. The exported file conforms to the Tell v0.2 specification.',
+    description: 'Export the complete portfolio as a .tell.json file. Defaults to portfolio.tell.json. The exported file conforms to the Tell v0.3 specification.',
   },
   {
     name: 'tell validate',

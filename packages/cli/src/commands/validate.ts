@@ -26,7 +26,7 @@ export const validateCommand = new Command('validate')
     const result = validateTellDocument(parsed);
 
     if (result.valid) {
-      console.log(pc.green(`${file} is valid Tell v0.2`));
+      console.log(pc.green(`${file} is valid Tell v0.3`));
     } else {
       console.log(pc.red(`${file} has ${result.errors.length} error(s):`));
       for (const err of result.errors) {

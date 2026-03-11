@@ -66,7 +66,7 @@ Five tools are available:
 
 ## Protocol
 
-Tell v0.2 defines 7 core entities:
+Tell v0.3 defines 7 core entities:
 
 - **Portfolio** — top-level container
 - **Bet** — falsifiable hypothesis your organisation invests in
@@ -76,7 +76,7 @@ Tell v0.2 defines 7 core entities:
 - **Scenario** — hypothetical portfolio modification
 - **Contributor** — human or agent that contributes evidence
 
-See the [full specification](docs/spec/SPEC-v0.2.md) for details.
+See the [full specification](docs/spec/SPEC-v0.3.md) for details.
 
 ## Development
 

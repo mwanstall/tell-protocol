@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://tell-protocol.org/schemas/v0.2/evidence.schema.json",
+  "$id": "https://tell-protocol.org/schemas/v0.3/evidence.schema.json",
   "title": "Evidence",
   "description": "A discrete signal that informs whether an assumption is holding or breaking. Immutable once written.",
   "type": "object",

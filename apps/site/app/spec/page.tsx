@@ -4,7 +4,7 @@ import Link from 'next/link'
 export const metadata: Metadata = {
   title: 'Specification',
   description:
-    'The Tell Protocol specification v0.2 — entities, schemas, conformance levels, and MCP integration for encoding strategic intent.',
+    'The Tell Protocol specification v0.3 — entities, schemas, conformance levels, and MCP integration for encoding strategic intent.',
 }
 
 function SectionAnchor({ id }: { id: string }) {
@@ -89,7 +89,7 @@ export default function SpecPage() {
         <div className="mx-auto max-w-6xl px-6">
           <div className="flex items-center gap-3">
             <span className="rounded-full bg-amber-500/10 px-3 py-1 text-xs font-semibold text-amber-400">
-              v0.2 Draft
+              v0.3
             </span>
           </div>
           <h1 className="mt-4 text-3xl font-bold text-white sm:text-4xl">
@@ -220,7 +220,7 @@ export default function SpecPage() {
                     { name: 'name', type: 'string', note: 'Human-readable name' },
                     { name: 'organisation', type: 'string', note: 'Owning organisation' },
                     { name: 'version', type: 'integer', note: 'Incremented on structural changes' },
-                    { name: 'tell_version', type: 'string', note: 'Protocol version (e.g. "0.2")' },
+                    { name: 'tell_version', type: 'string', note: 'Protocol version (e.g. "0.3")' },
                     { name: 'bets', type: 'Bet[]', note: 'Strategic bets in the portfolio' },
                     { name: 'connections', type: 'Connection[]', note: 'Cross-bet relationships' },
                     { name: 'scenarios', type: 'Scenario[]', note: 'What-if portfolio branches' },
@@ -590,7 +590,7 @@ export default function SpecPage() {
                 <div className="rounded-lg border border-navy-200 bg-navy-950 p-4">
                   <pre className="text-sm text-navy-300">
 {`{
-  "tell_version": "0.2",
+  "tell_version": "0.3",
   "portfolio": { ... }
 }`}
                   </pre>

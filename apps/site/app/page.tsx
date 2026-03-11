@@ -1,7 +1,7 @@
 import Link from 'next/link'
 
 const tellExample = `{
-  "tell_version": "0.2",
+  "tell_version": "0.3",
   "portfolio": {
     "name": "Chilli Finance — Strategic Portfolio",
     "organisation": "Chilli Finance",
@@ -64,7 +64,7 @@ export default function HomePage() {
             <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-navy-700 bg-navy-900 px-4 py-1.5">
               <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
               <span className="text-xs font-medium text-navy-300">
-                Open Protocol &middot; v0.2 Draft
+                Open Protocol &middot; v0.3
               </span>
             </div>
 

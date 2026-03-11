@@ -54,7 +54,7 @@ function scoreAssumption(assumption: Assumption, now: Date): number {
 }
 
 /**
- * Evidence-weighted confidence algorithm from TELL spec v0.2 Section 2.4.
+ * Evidence-weighted confidence algorithm from TELL spec v0.3 Section 2.4.
  *
  * Per-assumption scoring:
  * 1. Signal weight: supports=+1, weakens=-1, neutral=0

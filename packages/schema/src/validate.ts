@@ -54,7 +54,7 @@ function toValidationResult(valid: boolean, errors: typeof ajv.errors): Validati
 
 export function validateTellDocument(data: unknown): ValidationResult {
   const valid = ajv.validate(
-    'https://tell-protocol.org/schemas/v0.2/tell-document.schema.json',
+    'https://tell-protocol.org/schemas/v0.3/tell-document.schema.json',
     data,
   );
   return toValidationResult(valid, ajv.errors);
@@ -62,7 +62,7 @@ export function validateTellDocument(data: unknown): ValidationResult {
 
 export function validatePortfolio(data: unknown): ValidationResult {
   const valid = ajv.validate(
-    'https://tell-protocol.org/schemas/v0.2/portfolio.schema.json',
+    'https://tell-protocol.org/schemas/v0.3/portfolio.schema.json',
     data,
   );
   return toValidationResult(valid, ajv.errors);
@@ -70,7 +70,7 @@ export function validatePortfolio(data: unknown): ValidationResult {
 
 export function validateBet(data: unknown): ValidationResult {
   const valid = ajv.validate(
-    'https://tell-protocol.org/schemas/v0.2/bet.schema.json',
+    'https://tell-protocol.org/schemas/v0.3/bet.schema.json',
     data,
   );
   return toValidationResult(valid, ajv.errors);
@@ -78,7 +78,7 @@ export function validateBet(data: unknown): ValidationResult {
 
 export function validateAssumption(data: unknown): ValidationResult {
   const valid = ajv.validate(
-    'https://tell-protocol.org/schemas/v0.2/assumption.schema.json',
+    'https://tell-protocol.org/schemas/v0.3/assumption.schema.json',
     data,
   );
   return toValidationResult(valid, ajv.errors);
@@ -86,7 +86,7 @@ export function validateAssumption(data: unknown): ValidationResult {
 
 export function validateEvidence(data: unknown): ValidationResult {
   const valid = ajv.validate(
-    'https://tell-protocol.org/schemas/v0.2/evidence.schema.json',
+    'https://tell-protocol.org/schemas/v0.3/evidence.schema.json',
     data,
   );
   return toValidationResult(valid, ajv.errors);
@@ -94,7 +94,7 @@ export function validateEvidence(data: unknown): ValidationResult {
 
 export function validateConnection(data: unknown): ValidationResult {
   const valid = ajv.validate(
-    'https://tell-protocol.org/schemas/v0.2/connection.schema.json',
+    'https://tell-protocol.org/schemas/v0.3/connection.schema.json',
     data,
   );
   return toValidationResult(valid, ajv.errors);
@@ -102,7 +102,7 @@ export function validateConnection(data: unknown): ValidationResult {
 
 export function validateScenario(data: unknown): ValidationResult {
   const valid = ajv.validate(
-    'https://tell-protocol.org/schemas/v0.2/scenario.schema.json',
+    'https://tell-protocol.org/schemas/v0.3/scenario.schema.json',
     data,
   );
   return toValidationResult(valid, ajv.errors);
@@ -110,7 +110,7 @@ export function validateScenario(data: unknown): ValidationResult {
 
 export function validateExperiment(data: unknown): ValidationResult {
   const valid = ajv.validate(
-    'https://tell-protocol.org/schemas/v0.2/experiment.schema.json',
+    'https://tell-protocol.org/schemas/v0.3/experiment.schema.json',
     data,
   );
   return toValidationResult(valid, ajv.errors);
@@ -118,7 +118,7 @@ export function validateExperiment(data: unknown): ValidationResult {
 
 export function validateContributor(data: unknown): ValidationResult {
   const valid = ajv.validate(
-    'https://tell-protocol.org/schemas/v0.2/contributor.schema.json',
+    'https://tell-protocol.org/schemas/v0.3/contributor.schema.json',
     data,
   );
   return toValidationResult(valid, ajv.errors);

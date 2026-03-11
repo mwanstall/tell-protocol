@@ -153,7 +153,7 @@ export default function GuidePage() {
               </div>
               <pre className="overflow-x-auto p-5 text-[13px] leading-relaxed text-navy-300">
 {`{
-  "tell_version": "0.2",
+  "tell_version": "0.3",
   "portfolio": {
     "id": "portfolio_acme",
     "name": "Acme Corp — Strategic Portfolio",

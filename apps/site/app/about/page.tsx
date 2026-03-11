@@ -185,13 +185,13 @@ export default function AboutPage() {
                 {
                   version: 'v0.2',
                   title: 'Expanded Specification',
-                  status: 'current',
+                  status: 'complete',
                   desc: 'Full entity schemas, conformance levels, MCP integration patterns, evidence weighting algorithm.',
                 },
                 {
                   version: 'v0.3',
                   title: 'JSON Schema + Tooling',
-                  status: 'complete',
+                  status: 'current',
                   desc: 'Formal JSON Schema for all entities. CLI tool, MCP server, TypeScript libraries. Published as @tell-protocol/* npm packages.',
                 },
                 {

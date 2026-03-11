@@ -67,8 +67,8 @@ const minimalDocument = {
 };
 
 describe('TELL_VERSION', () => {
-  it('should be 0.2', () => {
-    expect(TELL_VERSION).toBe('0.2');
+  it('should be 0.3', () => {
+    expect(TELL_VERSION).toBe('0.3');
   });
 });
 
@@ -85,7 +85,7 @@ describe('validateTellDocument', () => {
   });
 
   it('rejects document without portfolio', () => {
-    const result = validateTellDocument({ tell_version: '0.2' });
+    const result = validateTellDocument({ tell_version: '0.3' });
     expect(result.valid).toBe(false);
   });
 
