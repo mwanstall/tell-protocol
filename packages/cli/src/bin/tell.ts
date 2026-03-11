@@ -10,6 +10,10 @@ import { exportCommand } from '../commands/export.js';
 import { validateCommand } from '../commands/validate.js';
 import { connectCommand } from '../commands/connect.js';
 import { experimentCommand } from '../commands/experiment.js';
+import { authCommand } from '../commands/auth.js';
+import { remoteCommand } from '../commands/remote.js';
+import { pushCommand } from '../commands/push.js';
+import { pullCommand } from '../commands/pull.js';
 
 const program = new Command()
   .name('tell')
@@ -27,5 +31,11 @@ program.addCommand(exportCommand);
 program.addCommand(validateCommand);
 program.addCommand(connectCommand);
 program.addCommand(experimentCommand);
+
+// Sync commands
+program.addCommand(authCommand);
+program.addCommand(remoteCommand);
+program.addCommand(pushCommand);
+program.addCommand(pullCommand);
 
 program.parse();

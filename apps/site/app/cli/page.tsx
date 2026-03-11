@@ -121,6 +121,46 @@ const commands = [
     usage: 'tell experiment abandon <experiment-id>',
     description: 'Abandon an experiment without an outcome.',
   },
+  {
+    name: 'tell auth login',
+    usage: 'tell auth login [--host <url>]',
+    description: 'Authenticate with an Apophenic platform instance using the device auth flow. Opens a browser where you enter a code to link your CLI to your account. Credentials are stored in ~/.config/tell/.',
+  },
+  {
+    name: 'tell auth logout',
+    usage: 'tell auth logout [--host <url>]',
+    description: 'Remove stored credentials for a platform host.',
+  },
+  {
+    name: 'tell auth status',
+    usage: 'tell auth status',
+    description: 'Show current authentication status — which platform hosts you are logged into.',
+  },
+  {
+    name: 'tell remote add',
+    usage: 'tell remote add <name> <url>',
+    description: 'Add a remote platform connection to this portfolio. The name is a short alias (e.g., "origin") and the URL points to an Apophenic platform instance.',
+  },
+  {
+    name: 'tell remote list',
+    usage: 'tell remote list',
+    description: 'List all configured remotes for this portfolio.',
+  },
+  {
+    name: 'tell remote remove',
+    usage: 'tell remote remove <name>',
+    description: 'Remove a remote connection from this portfolio.',
+  },
+  {
+    name: 'tell push',
+    usage: 'tell push [remote]',
+    description: 'Push this portfolio and all evidence to a remote platform. Defaults to the "origin" remote. On first push, creates a new portfolio on the platform and links it for future syncs.',
+  },
+  {
+    name: 'tell pull',
+    usage: 'tell pull [remote] [--force]',
+    description: 'Pull portfolio updates from a remote platform. Compares versions and warns if local is ahead of remote. Use --force to overwrite local changes.',
+  },
 ]
 
 export default function CLIPage() {
@@ -160,6 +200,7 @@ export default function CLIPage() {
             <pre className="text-sm leading-relaxed text-navy-300">
 {`.tell/
   portfolio.tell.json        # Portfolio state
+  config.json                # Remote connections (added by tell remote)
   evidence/
     asm_xxx.jsonl             # Append-only evidence (one file per assumption)
   history/

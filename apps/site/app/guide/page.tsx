@@ -330,11 +330,61 @@ await tell_write_evidence({
           </div>
         </section>
 
-        {/* Step 6: Choose Your Level */}
+        {/* Step 6: Sync to the Cloud */}
         <section className="mb-16">
           <div className="flex items-center gap-3">
             <span className="flex h-8 w-8 items-center justify-center rounded-full bg-amber-500 text-sm font-bold text-navy-950">
               6
+            </span>
+            <h2 className="text-2xl font-bold text-navy-900">
+              Sync to the Cloud
+            </h2>
+          </div>
+          <div className="mt-6 space-y-4 pl-11 text-navy-600">
+            <p>
+              Your portfolio lives locally in{' '}
+              <code className="rounded bg-navy-100 px-1.5 py-0.5 text-xs font-medium text-amber-600">
+                .tell/
+              </code>{' '}
+              — but you can push it to an Apophenic platform instance to share
+              it with your team, view it on a visual canvas, and keep it synced
+              across devices.
+            </p>
+
+            <div className="overflow-hidden rounded-xl border border-navy-200 bg-navy-950 p-5">
+              <p className="mb-4 text-xs font-medium uppercase tracking-widest text-navy-500">
+                Push your portfolio to the cloud
+              </p>
+              <pre className="text-[13px] leading-relaxed text-navy-300">
+{`# Authenticate with the platform
+$ tell auth login
+
+# Add a remote (like git remote add)
+$ tell remote add origin https://app.apophenic.com
+
+# Push your portfolio
+$ tell push
+
+# Later, pull updates from the platform
+$ tell pull`}
+              </pre>
+            </div>
+
+            <div className="rounded-lg border border-navy-200 bg-navy-50 p-4">
+              <p className="text-sm font-medium text-navy-700">
+                Think of it like GitHub for strategy. Your portfolio is the
+                repo, the platform is the remote, and push/pull keeps them
+                in sync.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Step 7: Choose Your Level */}
+        <section className="mb-16">
+          <div className="flex items-center gap-3">
+            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-amber-500 text-sm font-bold text-navy-950">
+              7
             </span>
             <h2 className="text-2xl font-bold text-navy-900">
               Choose Your Conformance Level
