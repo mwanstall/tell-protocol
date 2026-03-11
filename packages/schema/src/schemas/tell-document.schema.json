@@ -1,0 +1,22 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://tell-protocol.org/schemas/v0.2/tell-document.schema.json",
+  "title": "Tell Document",
+  "description": "A complete Tell protocol document containing a strategic portfolio.",
+  "type": "object",
+  "required": ["tell_version", "portfolio"],
+  "properties": {
+    "tell_version": {
+      "type": "string",
+      "const": "0.2"
+    },
+    "exported_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "portfolio": {
+      "$ref": "portfolio.schema.json"
+    }
+  },
+  "additionalProperties": false
+}

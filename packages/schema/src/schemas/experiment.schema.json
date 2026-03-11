@@ -1,0 +1,45 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://tell-protocol.org/schemas/v0.2/experiment.schema.json",
+  "title": "Experiment",
+  "description": "A time-boxed, cost-capped test designed to validate or falsify a bet's thesis through targeted assumption testing.",
+  "type": "object",
+  "required": ["id", "bet_id", "assumption_ids", "hypothesis", "method", "success_criteria", "status", "created_at", "updated_at"],
+  "properties": {
+    "id": { "type": "string", "minLength": 1 },
+    "bet_id": { "type": "string", "minLength": 1 },
+    "assumption_ids": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "minItems": 1
+    },
+    "hypothesis": { "type": "string", "minLength": 1 },
+    "method": { "type": "string", "minLength": 1 },
+    "success_criteria": { "type": "string", "minLength": 1 },
+    "failure_criteria": { "type": "string" },
+    "status": {
+      "type": "string",
+      "enum": ["planned", "running", "concluded", "abandoned"]
+    },
+    "cost_ceiling": { "type": "string" },
+    "time_box": { "type": "string" },
+    "owner": { "type": "string" },
+    "outcome": {
+      "type": "object",
+      "required": ["signal", "summary", "concluded_at"],
+      "properties": {
+        "signal": {
+          "type": "string",
+          "enum": ["supports", "weakens", "neutral"]
+        },
+        "summary": { "type": "string", "minLength": 1 },
+        "concluded_at": { "type": "string", "format": "date-time" }
+      },
+      "additionalProperties": false
+    },
+    "created_at": { "type": "string", "format": "date-time" },
+    "updated_at": { "type": "string", "format": "date-time" },
+    "extensions": { "type": "object" }
+  },
+  "additionalProperties": false
+}

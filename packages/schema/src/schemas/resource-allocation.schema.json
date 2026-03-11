@@ -1,0 +1,27 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://tell-protocol.org/schemas/v0.2/resource-allocation.schema.json",
+  "title": "Resource Allocation",
+  "description": "Resources committed to a bet.",
+  "type": "object",
+  "required": ["id", "bet_id", "resource_type", "label", "amount", "unit", "created_at"],
+  "properties": {
+    "id": { "type": "string", "minLength": 1 },
+    "bet_id": { "type": "string", "minLength": 1 },
+    "resource_type": {
+      "type": "string",
+      "enum": ["budget", "headcount", "time", "other"]
+    },
+    "label": { "type": "string", "minLength": 1 },
+    "amount": { "type": "number" },
+    "unit": { "type": "string", "minLength": 1 },
+    "period": {
+      "type": "string",
+      "enum": ["one_time", "monthly", "quarterly", "annual"]
+    },
+    "notes": { "type": "string" },
+    "created_at": { "type": "string", "format": "date-time" },
+    "updated_at": { "type": "string", "format": "date-time" }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,38 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://tell-protocol.org/schemas/v0.2/connection.schema.json",
+  "title": "Connection",
+  "description": "A relationship between two bets.",
+  "type": "object",
+  "required": ["id", "type", "bet_ids", "description", "created_at"],
+  "properties": {
+    "id": { "type": "string", "minLength": 1 },
+    "type": {
+      "type": "string",
+      "enum": ["tension", "synergy", "dependency", "resource_conflict"]
+    },
+    "bet_ids": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "minItems": 2,
+      "maxItems": 2
+    },
+    "description": { "type": "string", "minLength": 1 },
+    "severity": {
+      "type": "string",
+      "enum": ["critical", "moderate", "low"]
+    },
+    "status": {
+      "type": "string",
+      "enum": ["active", "monitoring", "resolved", "escalated"]
+    },
+    "identified_by": {
+      "type": "string",
+      "enum": ["human", "ai"]
+    },
+    "created_at": { "type": "string", "format": "date-time" },
+    "updated_at": { "type": "string", "format": "date-time" },
+    "extensions": { "type": "object" }
+  },
+  "additionalProperties": false
+}

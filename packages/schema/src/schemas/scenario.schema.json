@@ -1,0 +1,48 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://tell-protocol.org/schemas/v0.2/scenario.schema.json",
+  "title": "Scenario",
+  "description": "A hypothetical portfolio modification. The 'branch' in the Git analogy.",
+  "type": "object",
+  "required": ["id", "name", "description", "status", "modifications", "created_by", "created_at"],
+  "properties": {
+    "id": { "type": "string", "minLength": 1 },
+    "name": { "type": "string", "minLength": 1 },
+    "description": { "type": "string", "minLength": 1 },
+    "status": {
+      "type": "string",
+      "enum": ["draft", "explored", "enacted", "rejected"]
+    },
+    "modifications": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["bet_id", "inclusion"],
+        "properties": {
+          "bet_id": { "type": "string", "minLength": 1 },
+          "inclusion": {
+            "type": "string",
+            "enum": ["included", "excluded", "modified"]
+          },
+          "confidence_override": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "status_override": {
+            "type": "string",
+            "enum": ["active", "paused", "killed", "succeeded"]
+          },
+          "notes": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "implications": { "type": "string" },
+    "created_by": { "type": "string", "minLength": 1 },
+    "created_at": { "type": "string", "format": "date-time" },
+    "updated_at": { "type": "string", "format": "date-time" },
+    "extensions": { "type": "object" }
+  },
+  "additionalProperties": false
+}

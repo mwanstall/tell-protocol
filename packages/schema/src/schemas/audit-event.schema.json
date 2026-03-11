@@ -1,0 +1,27 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://tell-protocol.org/schemas/v0.2/audit-event.schema.json",
+  "title": "Audit Event",
+  "description": "An append-only record of a structural change to the model.",
+  "type": "object",
+  "required": ["id", "portfolio_id", "entity_type", "entity_id", "action", "created_at"],
+  "properties": {
+    "id": { "type": "string", "minLength": 1 },
+    "portfolio_id": { "type": "string", "minLength": 1 },
+    "entity_type": {
+      "type": "string",
+      "enum": ["bet", "assumption", "connection", "evidence", "scenario", "portfolio"]
+    },
+    "entity_id": { "type": "string", "minLength": 1 },
+    "action": {
+      "type": "string",
+      "enum": ["status_change", "confidence_override", "retraction", "creation", "deletion", "modification"]
+    },
+    "previous_value": { "type": "string" },
+    "new_value": { "type": "string" },
+    "performed_by": { "type": "string" },
+    "metadata": { "type": "object" },
+    "created_at": { "type": "string", "format": "date-time" }
+  },
+  "additionalProperties": false
+}

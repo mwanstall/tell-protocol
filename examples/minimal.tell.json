@@ -1,0 +1,52 @@
+{
+  "tell_version": "0.2",
+  "portfolio": {
+    "id": "pf_minimal_example",
+    "name": "Minimal Example",
+    "organisation": "Example Corp",
+    "version": 1,
+    "created_at": "2026-03-01T00:00:00Z",
+    "updated_at": "2026-03-01T00:00:00Z",
+    "bets": [
+      {
+        "id": "bet_first",
+        "thesis": "Users prefer AI-generated summaries over reading full articles",
+        "status": "active",
+        "created_at": "2026-03-01T00:00:00Z",
+        "updated_at": "2026-03-01T00:00:00Z",
+        "assumptions": [
+          {
+            "id": "asm_engagement",
+            "statement": "Users engage with summaries at least 2x more than full content",
+            "status": "holding",
+            "bet_ids": ["bet_first"],
+            "evidence": [
+              {
+                "id": "ev_ab_test",
+                "assumption_ids": ["asm_engagement"],
+                "source_type": "human",
+                "contributor_id": "ctr_owner",
+                "signal": "supports",
+                "confidence": "high",
+                "summary": "A/B test shows 3.2x engagement with AI summaries vs full articles",
+                "timestamp": "2026-03-01T10:00:00Z",
+                "recorded_at": "2026-03-01T10:00:00Z"
+              }
+            ],
+            "created_at": "2026-03-01T00:00:00Z"
+          }
+        ]
+      }
+    ],
+    "connections": [],
+    "contributors": [
+      {
+        "id": "ctr_owner",
+        "type": "human",
+        "name": "Portfolio Owner",
+        "role": "owner",
+        "created_at": "2026-03-01T00:00:00Z"
+      }
+    ]
+  }
+}
