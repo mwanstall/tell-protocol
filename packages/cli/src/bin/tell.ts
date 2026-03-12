@@ -21,7 +21,7 @@ import { pullCommand } from '../commands/pull.js';
 const program = new Command()
   .name('tell')
   .description('The Tell Protocol CLI — encode strategic intent')
-  .version('0.3.4')
+  .version('0.3.5')
   .exitOverride() // throw instead of process.exit so the REPL survives
   .action(() => {
     // When invoked with no args, start interactive mode (TTY) or show help (non-TTY)
@@ -123,6 +123,12 @@ function startRepl(): void {
       return;
     }
 
+    // Pause the REPL readline so interactive sub-commands (inquirer prompts)
+    // get exclusive control of stdin — prevents the REPL from intercepting
+    // user input meant for prompts and trying to parse it as a command.
+    rl.pause();
+    process.stdin.removeAllListeners('data');
+
     // Parse and execute command
     const tokens = tokenize(input);
     try {
@@ -139,6 +145,7 @@ function startRepl(): void {
     }
 
     console.log();
+    rl.resume();
     rl.prompt();
   });
 
