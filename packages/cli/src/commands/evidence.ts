@@ -1,14 +1,13 @@
 import { Command } from 'commander';
 import pc from 'picocolors';
-import { FileStore, resolveTellDir } from '../store/file-store.js';
+import { FileStore } from '../store/file-store.js';
+import { ensurePortfolio } from '../output/format.js';
+import { box } from '../output/box.js';
+import { symbols, signalSymbol } from '../output/symbols.js';
 import type { SignalDirection, SignalConfidence } from '@tell-protocol/core';
 
 function getStore(): FileStore {
-  const tellDir = resolveTellDir();
-  if (!tellDir) {
-    console.error(pc.red('No Tell portfolio found. Run "tell init" first.'));
-    process.exit(1);
-  }
+  const tellDir = ensurePortfolio();
   return new FileStore(tellDir);
 }
 
@@ -35,11 +34,17 @@ const addCmd = new Command('add')
     });
 
     const signalColor = opts.signal === 'supports' ? pc.green : opts.signal === 'weakens' ? pc.red : pc.dim;
-    console.log(pc.green('Evidence recorded:'));
-    console.log(`  ID:         ${pc.bold(evidence.id)}`);
-    console.log(`  Signal:     ${signalColor(opts.signal)}`);
-    console.log(`  Confidence: ${opts.confidence}`);
-    console.log(`  Summary:    ${summary}`);
+
+    console.log();
+    console.log(box([
+      `${pc.green(symbols.success)} ${pc.bold('Evidence recorded')}`,
+      '',
+      `  ${pc.dim('ID')}         ${pc.bold(evidence.id)}`,
+      `  ${pc.dim('Signal')}     ${signalSymbol(opts.signal)} ${signalColor(opts.signal)}`,
+      `  ${pc.dim('Confidence')} ${opts.confidence}`,
+      `  ${pc.dim('Summary')}    ${summary}`,
+    ], { borderColor: pc.green }));
+    console.log();
   });
 
 const listCmd = new Command('list')
@@ -54,12 +59,12 @@ const listCmd = new Command('list')
       return;
     }
 
+    console.log();
     for (const ev of evidence) {
-      const signalColor = ev.signal === 'supports' ? pc.green : ev.signal === 'weakens' ? pc.red : pc.dim;
       const retracted = ev.is_retracted ? pc.strikethrough(pc.dim(' [retracted]')) : '';
-      console.log(`  ${pc.dim(ev.id)}  ${signalColor(ev.signal)}  ${pc.dim(ev.confidence || 'medium')}${retracted}`);
-      console.log(`  ${ev.summary}`);
-      console.log(`  ${pc.dim(new Date(ev.timestamp).toLocaleDateString())}  ${pc.dim(ev.source_type)}`);
+      console.log(`  ${signalSymbol(ev.signal)} ${pc.dim(ev.id)}  ${ev.signal}  ${pc.dim(ev.confidence || 'medium')}${retracted}`);
+      console.log(`    ${ev.summary}`);
+      console.log(`    ${pc.dim(new Date(ev.timestamp).toLocaleDateString())}  ${pc.dim(ev.source_type)}`);
       console.log();
     }
   });

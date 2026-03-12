@@ -1,20 +1,38 @@
 import pc from 'picocolors';
 import type { BetStatus, AssumptionStatus, ConnectionType } from '@tell-protocol/core';
+import { symbols, statusSymbol } from './symbols.js';
+import { resolveTellDir } from '../store/file-store.js';
 
 export function colorStatus(status: BetStatus | AssumptionStatus): string {
+  const sym = statusSymbol(status);
   switch (status) {
     case 'active':
     case 'holding':
-      return pc.green(status);
+      return `${sym} ${pc.green(status)}`;
     case 'paused':
     case 'pressure':
-      return pc.yellow(status);
+      return `${sym} ${pc.yellow(status)}`;
     case 'killed':
     case 'failing':
-      return pc.red(status);
+      return `${sym} ${pc.red(status)}`;
     case 'succeeded':
-      return pc.cyan(status);
+      return `${sym} ${pc.cyan(status)}`;
     case 'unknown':
+      return `${sym} ${pc.dim(status)}`;
+    default:
+      return status;
+  }
+}
+
+export function colorExpStatus(status: string): string {
+  switch (status) {
+    case 'running':
+      return pc.blue(status);
+    case 'completed':
+      return pc.cyan(status);
+    case 'abandoned':
+      return pc.dim(status);
+    case 'planned':
       return pc.dim(status);
     default:
       return status;
@@ -68,4 +86,25 @@ export function padRight(text: string, len: number): string {
 
 export function header(text: string): string {
   return pc.bold(pc.white(text));
+}
+
+export function formatSuccess(msg: string): string {
+  return `${pc.green(symbols.success)} ${msg}`;
+}
+
+export function formatError(msg: string): string {
+  return `${pc.red(symbols.error)} ${msg}`;
+}
+
+export function formatWarning(msg: string): string {
+  return `${pc.yellow(symbols.warning)} ${msg}`;
+}
+
+export function ensurePortfolio(): string {
+  const tellDir = resolveTellDir();
+  if (!tellDir) {
+    console.error(formatError('No Tell portfolio found. Run "tell init" first.'));
+    process.exit(1);
+  }
+  return tellDir;
 }

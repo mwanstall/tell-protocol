@@ -31,7 +31,7 @@ export default function AboutPage() {
             <p>
               Every layer of the modern technology stack has a standard.
               Authentication has OAuth. APIs have OpenAPI. Agent tooling has MCP.
-              Code has Git.
+              Code has version control.
             </p>
             <p>
               Strategy has nothing.
@@ -89,68 +89,25 @@ export default function AboutPage() {
           <h2 className="text-2xl font-bold text-navy-900">
             Protocol vs. Platform
           </h2>
-          <div className="mt-4 space-y-4 text-navy-600">
-            <p>
-              The relationship between Tell and Apophenic mirrors Git and GitHub.
-            </p>
-          </div>
-
-          <div className="mt-6 overflow-hidden rounded-xl border border-navy-200">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-navy-200 bg-navy-50">
-                  <th className="px-4 py-3 text-left font-semibold text-navy-500"></th>
-                  <th className="px-4 py-3 text-left font-semibold text-navy-900">
-                    Tell
-                  </th>
-                  <th className="px-4 py-3 text-left font-semibold text-navy-900">
-                    Apophenic
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr className="border-b border-navy-100">
-                  <td className="px-4 py-3 text-sm font-medium text-navy-500">
-                    What it is
-                  </td>
-                  <td className="px-4 py-3 text-sm text-navy-600">
-                    Open protocol
-                  </td>
-                  <td className="px-4 py-3 text-sm text-navy-600">
-                    Platform
-                  </td>
-                </tr>
-                <tr className="border-b border-navy-100">
-                  <td className="px-4 py-3 text-sm font-medium text-navy-500">
-                    Ownership
-                  </td>
-                  <td className="px-4 py-3 text-sm text-navy-600">
-                    Community-governed (eventually)
-                  </td>
-                  <td className="px-4 py-3 text-sm text-navy-600">
-                    Proprietary
-                  </td>
-                </tr>
-                <tr className="border-b border-navy-100">
-                  <td className="px-4 py-3 text-sm font-medium text-navy-500">
-                    Purpose
-                  </td>
-                  <td className="px-4 py-3 text-sm text-navy-600">
-                    Define the standard. Proliferate.
-                  </td>
-                  <td className="px-4 py-3 text-sm text-navy-600">
-                    Canonical implementation. Full experience.
-                  </td>
-                </tr>
-                <tr>
-                  <td className="px-4 py-3 text-sm font-medium text-navy-500">
-                    Analogy
-                  </td>
-                  <td className="px-4 py-3 text-sm text-navy-600">Git</td>
-                  <td className="px-4 py-3 text-sm text-navy-600">GitHub</td>
-                </tr>
-              </tbody>
-            </table>
+          <div className="mt-6 grid gap-6 sm:grid-cols-2">
+            <div className="rounded-xl border border-navy-200 bg-navy-50 p-6">
+              <h3 className="font-semibold text-navy-900">Tell — The Protocol</h3>
+              <ul className="mt-3 space-y-2 text-sm text-navy-600">
+                <li>Open standard, Apache-2.0 licensed</li>
+                <li>Defines the format and semantics</li>
+                <li>Community-governed as it matures</li>
+                <li>Anyone can implement it</li>
+              </ul>
+            </div>
+            <div className="rounded-xl border-2 border-amber-500 bg-amber-50 p-6">
+              <h3 className="font-semibold text-navy-900">Apophenic — The Platform</h3>
+              <ul className="mt-3 space-y-2 text-sm text-navy-600">
+                <li>Canonical Level 3 implementation</li>
+                <li>Visual canvas, real-time collaboration</li>
+                <li>AI-powered strategic intelligence</li>
+                <li>Cloud sync and team features</li>
+              </ul>
+            </div>
           </div>
 
           <div className="mt-6 space-y-4 text-navy-600">
@@ -270,17 +227,16 @@ export default function AboutPage() {
             </p>
             <p>
               The specification, JSON schemas, and reference implementations are
-              published openly. Feedback, issues, and contributions are welcome
-              via the{' '}
+              published openly as{' '}
               <a
-                href="https://github.com/apophenic/tell-protocol"
+                href="https://www.npmjs.com/org/tell-protocol"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-amber-600 underline underline-offset-2 hover:text-amber-500"
               >
-                GitHub repository
+                @tell-protocol npm packages
               </a>
-              .
+              . Feedback and contributions are welcome.
             </p>
           </div>
         </section>

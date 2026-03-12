@@ -7,7 +7,7 @@
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "bin": {
-    "tell": "./dist/bin/tell.js"
+    "tell": "./dist/tell.js"
   },
   "exports": {
     ".": {
@@ -26,9 +26,12 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
+    "@inquirer/prompts": "^8.3.0",
     "@tell-protocol/core": "workspace:*",
     "@tell-protocol/schema": "workspace:*",
     "commander": "^13.0.0",
+    "gradient-string": "^3.0.0",
+    "ora": "^9.3.0",
     "picocolors": "^1.1.0"
   },
   "devDependencies": {
@@ -37,5 +40,8 @@
     "typescript": "^5.7.0",
     "vitest": "^3.0.0"
   },
-  "license": "Apache-2.0"
+  "license": "Apache-2.0",
+  "publishConfig": {
+    "access": "public"
+  }
 }

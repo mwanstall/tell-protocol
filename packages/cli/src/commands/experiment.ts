@@ -1,31 +1,15 @@
 import { Command } from 'commander';
 import pc from 'picocolors';
-import { FileStore, resolveTellDir } from '../store/file-store.js';
-import { colorStatus, truncate, header } from '../output/format.js';
+import { FileStore } from '../store/file-store.js';
+import { truncate, ensurePortfolio, formatSuccess, formatError, colorExpStatus } from '../output/format.js';
+import { box, section } from '../output/box.js';
+import { symbols, experimentStatusSymbol, signalSymbol } from '../output/symbols.js';
+import { nextSteps } from '../output/hints.js';
 import type { ExperimentStatus } from '@tell-protocol/core';
 
 function getStore(): FileStore {
-  const tellDir = resolveTellDir();
-  if (!tellDir) {
-    console.error(pc.red('No Tell portfolio found. Run "tell init" first.'));
-    process.exit(1);
-  }
+  const tellDir = ensurePortfolio();
   return new FileStore(tellDir);
-}
-
-function colorExpStatus(status: ExperimentStatus): string {
-  switch (status) {
-    case 'planned':
-      return pc.dim(status);
-    case 'running':
-      return pc.blue(status);
-    case 'concluded':
-      return pc.green(status);
-    case 'abandoned':
-      return pc.red(status);
-    default:
-      return status;
-  }
 }
 
 const addCmd = new Command('add')
@@ -43,7 +27,7 @@ const addCmd = new Command('add')
     const store = getStore();
     const bet = await store.getBet(betId);
     if (!bet) {
-      console.error(pc.red(`Bet not found: ${betId}`));
+      console.error(formatError(`Bet not found: ${betId}`));
       process.exit(1);
     }
 
@@ -64,16 +48,23 @@ const addCmd = new Command('add')
       owner: opts.owner,
     });
 
-    console.log(pc.green('Experiment created:'));
-    console.log(`  ID:         ${pc.bold(experiment.id)}`);
-    console.log(`  Bet:        ${betId}`);
-    console.log(`  Hypothesis: ${hypothesis}`);
-    console.log(`  Method:     ${opts.method}`);
-    console.log(`  Success:    ${opts.success}`);
-    if (opts.cost) console.log(`  Cost cap:   ${opts.cost}`);
-    if (opts.timebox) console.log(`  Time box:   ${opts.timebox}`);
+    const lines = [
+      `${pc.green(symbols.success)} ${pc.bold('Experiment created')}`,
+      '',
+      `  ${pc.dim('ID')}         ${pc.bold(experiment.id)}`,
+      `  ${pc.dim('Bet')}        ${betId}`,
+      `  ${pc.dim('Hypothesis')} ${hypothesis}`,
+      `  ${pc.dim('Method')}     ${opts.method}`,
+      `  ${pc.dim('Success')}    ${opts.success}`,
+    ];
+    if (opts.cost) lines.push(`  ${pc.dim('Cost cap')}   ${opts.cost}`);
+    if (opts.timebox) lines.push(`  ${pc.dim('Time box')}   ${opts.timebox}`);
+
     console.log();
-    console.log(pc.dim(`Next: tell experiment start ${experiment.id}`));
+    console.log(box(lines, { borderColor: pc.green }));
+    console.log();
+    console.log(nextSteps([`tell experiment start ${experiment.id}`]));
+    console.log();
   });
 
 const listCmd = new Command('list')
@@ -86,19 +77,22 @@ const listCmd = new Command('list')
       : await store.getExperiments();
 
     if (experiments.length === 0) {
-      console.log(pc.dim('No experiments yet. Run "tell experiment add" to create one.'));
+      console.log(pc.dim('No experiments yet.'));
+      console.log();
+      console.log(nextSteps(['tell experiment add <bet-id> "Your hypothesis"']));
+      console.log();
       return;
     }
 
-    console.log(header('Experiments'));
     console.log();
+    console.log(section('Experiments'));
 
     for (const exp of experiments) {
-      console.log(`  ${pc.bold(exp.id)}  ${colorExpStatus(exp.status)}  ${pc.dim(exp.bet_id)}`);
-      console.log(`  ${truncate(exp.hypothesis, 80)}`);
+      console.log(`  ${experimentStatusSymbol(exp.status)} ${pc.bold(exp.id)}  ${colorExpStatus(exp.status)}  ${pc.dim(exp.bet_id)}`);
+      console.log(`    ${truncate(exp.hypothesis, 76)}`);
       if (exp.outcome) {
         const signalColor = exp.outcome.signal === 'supports' ? pc.green : exp.outcome.signal === 'weakens' ? pc.red : pc.yellow;
-        console.log(`  Outcome: ${signalColor(exp.outcome.signal)} — ${truncate(exp.outcome.summary, 60)}`);
+        console.log(`    ${signalSymbol(exp.outcome.signal)} Outcome: ${signalColor(exp.outcome.signal)} ${symbols.dash} ${truncate(exp.outcome.summary, 56)}`);
       }
       console.log();
     }
@@ -110,7 +104,7 @@ const startCmd = new Command('start')
   .action(async (id) => {
     const store = getStore();
     const experiment = await store.updateExperiment(id, { status: 'running' as ExperimentStatus });
-    console.log(pc.blue(`Experiment started: ${experiment.id}`));
+    console.log(`${pc.blue(symbols.active)} Experiment started: ${pc.bold(experiment.id)}`);
   });
 
 const concludeCmd = new Command('conclude')
@@ -129,9 +123,16 @@ const concludeCmd = new Command('conclude')
       },
     });
     const signalColor = opts.signal === 'supports' ? pc.green : opts.signal === 'weakens' ? pc.red : pc.yellow;
-    console.log(`Experiment concluded: ${experiment.id}`);
-    console.log(`  Signal: ${signalColor(opts.signal)}`);
-    console.log(`  ${opts.summary}`);
+
+    console.log();
+    console.log(box([
+      `${pc.cyan(symbols.success)} ${pc.bold('Experiment concluded')}`,
+      '',
+      `  ${pc.dim('ID')}     ${pc.bold(experiment.id)}`,
+      `  ${pc.dim('Signal')} ${signalSymbol(opts.signal)} ${signalColor(opts.signal)}`,
+      `  ${pc.dim('Result')} ${opts.summary}`,
+    ], { borderColor: pc.cyan }));
+    console.log();
   });
 
 const abandonCmd = new Command('abandon')
@@ -140,7 +141,7 @@ const abandonCmd = new Command('abandon')
   .action(async (id) => {
     const store = getStore();
     const experiment = await store.updateExperiment(id, { status: 'abandoned' as ExperimentStatus });
-    console.log(pc.red(`Experiment abandoned: ${experiment.id}`));
+    console.log(formatError(`Experiment abandoned: ${pc.bold(experiment.id)}`));
   });
 
 export const experimentCommand = new Command('experiment')

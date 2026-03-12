@@ -9,7 +9,7 @@ export const metadata: Metadata = {
     template: '%s | Tell Protocol',
   },
   description:
-    'Tell is an open protocol for encoding strategic intent in a machine-readable format. Define bets, track assumptions, surface evidence. The Git for strategy.',
+    'Tell is an open protocol for encoding strategic intent in a machine-readable format. Define bets, track assumptions, surface evidence. Machine-readable. Human-meaningful.',
   keywords: [
     'Tell protocol',
     'strategic intent',
@@ -31,7 +31,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Tell Protocol',
     description:
-      'The open standard for encoding strategic intent. The Git for strategy.',
+      'The open standard for encoding strategic intent. Machine-readable. Human-meaningful.',
   },
 }
 

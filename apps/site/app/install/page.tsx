@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Link from 'next/link'
 
 export const metadata: Metadata = {
   title: 'Install',
@@ -41,6 +42,17 @@ export default function InstallPage() {
           <p className="mt-4 text-lg text-navy-300">
             Get started with the Tell Protocol tooling. All packages require Node.js 20+.
           </p>
+          <div className="mt-6 flex items-center gap-3 rounded-lg border border-navy-700 bg-navy-900 px-4 py-3">
+            <svg className="h-5 w-5 shrink-0 text-amber-400" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z" />
+            </svg>
+            <p className="text-sm text-navy-300">
+              <strong className="text-navy-100">Prerequisites:</strong>{' '}
+              <a href="https://nodejs.org" target="_blank" rel="noopener noreferrer" className="text-amber-400 underline underline-offset-2 hover:text-amber-300">Node.js 20+</a>{' '}
+              and npm (included with Node.js). Verify with{' '}
+              <code className="rounded bg-navy-800 px-1 py-0.5 text-xs text-amber-400">node --version</code>.
+            </p>
+          </div>
         </div>
       </section>
 
@@ -66,6 +78,26 @@ $ tell bet add "Users prefer AI summaries" --horizon 6m
 $ tell status`}
                 </code>
               </pre>
+            </div>
+
+            <div className="mt-8 rounded-xl border border-navy-200 bg-navy-50 p-6">
+              <h3 className="text-sm font-semibold uppercase tracking-widest text-navy-400">
+                What happens
+              </h3>
+              <ul className="mt-4 space-y-3 text-sm text-navy-600">
+                <li className="flex items-start gap-3">
+                  <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-amber-500 text-xs font-bold text-navy-950">1</span>
+                  <span><code className="rounded bg-navy-100 px-1 py-0.5 text-xs text-amber-600">tell init</code> creates a <code className="rounded bg-navy-100 px-1 py-0.5 text-xs text-amber-600">.tell/</code> directory with your portfolio file, evidence store, and version history.</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-amber-500 text-xs font-bold text-navy-950">2</span>
+                  <span><code className="rounded bg-navy-100 px-1 py-0.5 text-xs text-amber-600">tell bet add</code> adds your first strategic bet — a falsifiable hypothesis your organisation is testing with real resources.</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-amber-500 text-xs font-bold text-navy-950">3</span>
+                  <span><code className="rounded bg-navy-100 px-1 py-0.5 text-xs text-amber-600">tell status</code> shows a health overview of your portfolio: bet counts, assumption states, and evidence totals.</span>
+                </li>
+              </ul>
             </div>
           </div>
 
@@ -180,6 +212,38 @@ const portfolio = await store.getPortfolio()
 const json = serialize(portfolio)  // → valid .tell.json`}
                 </code>
               </pre>
+            </div>
+          </div>
+
+          {/* Next Steps */}
+          <div className="mt-16 rounded-xl border border-navy-200 bg-navy-50 p-6">
+            <h3 className="text-lg font-semibold text-navy-900">Next steps</h3>
+            <p className="mt-2 text-sm text-navy-500">
+              Now that you have the tooling installed, learn how to model your
+              organisation&apos;s strategic intent.
+            </p>
+            <div className="mt-4 flex flex-wrap gap-3">
+              <Link
+                href="/guide"
+                className="inline-flex items-center gap-2 rounded-lg bg-amber-500 px-4 py-2 text-sm font-semibold text-navy-950 transition-colors hover:bg-amber-400"
+              >
+                Getting Started Guide
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                </svg>
+              </Link>
+              <Link
+                href="/cli"
+                className="inline-flex items-center gap-2 rounded-lg border border-navy-300 px-4 py-2 text-sm font-semibold text-navy-700 transition-colors hover:bg-navy-100"
+              >
+                CLI Reference
+              </Link>
+              <Link
+                href="/spec"
+                className="inline-flex items-center gap-2 rounded-lg border border-navy-300 px-4 py-2 text-sm font-semibold text-navy-700 transition-colors hover:bg-navy-100"
+              >
+                Full Specification
+              </Link>
             </div>
           </div>
         </div>

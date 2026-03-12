@@ -50,8 +50,9 @@ export default function GuidePage() {
             </p>
             <div className="rounded-lg border border-navy-200 bg-navy-50 p-4">
               <p className="text-sm font-medium text-navy-700">
-                Think of it this way: Git gave code a standard for tracking
-                changes. Tell gives strategy a standard for encoding intent.
+                GAAP standardised how companies report finances. OpenAPI
+                standardised how services describe their interfaces. Tell
+                standardises how organisations encode strategic intent.
               </p>
             </div>
           </div>
@@ -359,7 +360,7 @@ await tell_write_evidence({
 {`# Authenticate with the platform
 $ tell auth login
 
-# Add a remote (like git remote add)
+# Add a remote
 $ tell remote add origin https://app.apophenic.com
 
 # Push your portfolio
@@ -372,9 +373,9 @@ $ tell pull`}
 
             <div className="rounded-lg border border-navy-200 bg-navy-50 p-4">
               <p className="text-sm font-medium text-navy-700">
-                Think of it like GitHub for strategy. Your portfolio is the
-                repo, the platform is the remote, and push/pull keeps them
-                in sync.
+                Your portfolio lives locally, the platform is your remote.
+                Push and pull keeps them in sync — so your team always has
+                the latest strategic state.
               </p>
             </div>
           </div>
@@ -466,17 +467,15 @@ $ tell pull`}
               </Link>
             </li>
             <li>
-              <a
-                href="https://github.com/apophenic/tell-protocol"
-                target="_blank"
-                rel="noopener noreferrer"
+              <Link
+                href="/install"
                 className="flex items-center gap-2 text-sm font-medium text-amber-600 hover:text-amber-500"
               >
                 <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
                 </svg>
-                Explore the GitHub repo
-              </a>
+                Install the CLI and start building
+              </Link>
             </li>
             <li>
               <a

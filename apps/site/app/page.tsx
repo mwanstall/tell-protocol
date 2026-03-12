@@ -40,7 +40,7 @@ const protocolStack = [
   { name: 'Authentication', protocol: 'OAuth', color: 'bg-navy-200 text-navy-700' },
   { name: 'APIs', protocol: 'OpenAPI', color: 'bg-navy-200 text-navy-700' },
   { name: 'Agent Tools', protocol: 'MCP', color: 'bg-navy-200 text-navy-700' },
-  { name: 'Code', protocol: 'Git', color: 'bg-navy-200 text-navy-700' },
+  { name: 'Version Control', protocol: 'VCS', color: 'bg-navy-200 text-navy-700' },
   { name: 'Strategy', protocol: 'Tell', color: 'bg-amber-500 text-white' },
 ]
 
@@ -226,7 +226,7 @@ export default function HomePage() {
             </h2>
             <p className="mt-4 text-lg text-navy-500">
               The <code className="rounded bg-navy-100 px-1.5 py-0.5 text-sm font-medium text-navy-700">tell</code> CLI
-              lets you manage your strategic portfolio the way you manage code.
+              lets you manage your strategic portfolio from the terminal.
             </p>
           </div>
 
@@ -268,21 +268,21 @@ $ tell status
       <section className="border-b border-navy-200 bg-white py-20 sm:py-28">
         <div className="mx-auto max-w-6xl px-6">
           <div className="grid gap-8 md:grid-cols-3">
-            {/* Git for Strategy */}
+            {/* Strategy Deserves a Protocol */}
             <div className="rounded-2xl border border-navy-200 p-8">
               <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg bg-navy-100">
                 <svg className="h-5 w-5 text-navy-600" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
                 </svg>
               </div>
               <h3 className="text-lg font-semibold text-navy-900">
-                Git for Strategy
+                Strategy Deserves a Protocol
               </h3>
               <p className="mt-2 text-sm leading-relaxed text-navy-500">
-                Git defined how code changes are tracked. Tell defines how strategic
-                intent is structured. GitHub built the platform on Git. Apophenic
-                builds the platform on Tell. The protocol is open — anyone can
-                implement it.
+                Accounting has GAAP. APIs have OpenAPI. Identity has OAuth.
+                Strategic intent has nothing — it lives in slide decks no system
+                can read. Tell gives strategy a machine-readable format that
+                humans and AI can work with.
               </p>
             </div>
 

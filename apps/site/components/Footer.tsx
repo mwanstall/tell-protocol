@@ -49,41 +49,31 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Community */}
+          {/* Resources */}
           <div>
             <h3 className="text-xs font-semibold uppercase tracking-wider text-navy-400">
-              Community
+              Resources
             </h3>
             <ul className="mt-3 space-y-2">
               <li>
-                <a
-                  href="https://github.com/apophenic/tell-protocol"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-sm text-navy-600 transition-colors hover:text-navy-900"
-                >
-                  GitHub
-                </a>
+                <Link href="/guide" className="text-sm text-navy-600 transition-colors hover:text-navy-900">
+                  Getting Started
+                </Link>
               </li>
               <li>
                 <a
-                  href="https://github.com/apophenic/tell-protocol/issues"
+                  href="https://www.npmjs.com/org/tell-protocol"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-sm text-navy-600 transition-colors hover:text-navy-900"
                 >
-                  Report an Issue
+                  npm Packages
                 </a>
               </li>
               <li>
-                <a
-                  href="https://github.com/apophenic/tell-protocol/blob/main/CONTRIBUTING.md"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-sm text-navy-600 transition-colors hover:text-navy-900"
-                >
-                  Contributing
-                </a>
+                <Link href="/spec" className="text-sm text-navy-600 transition-colors hover:text-navy-900">
+                  Documentation
+                </Link>
               </li>
             </ul>
           </div>

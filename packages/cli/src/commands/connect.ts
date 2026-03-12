@@ -1,15 +1,13 @@
 import { Command } from 'commander';
 import pc from 'picocolors';
-import { FileStore, resolveTellDir } from '../store/file-store.js';
-import { connectionTypeLabel } from '../output/format.js';
+import { FileStore } from '../store/file-store.js';
+import { connectionTypeLabel, ensurePortfolio, formatSuccess } from '../output/format.js';
+import { box } from '../output/box.js';
+import { symbols } from '../output/symbols.js';
 import type { ConnectionType } from '@tell-protocol/core';
 
 function getStore(): FileStore {
-  const tellDir = resolveTellDir();
-  if (!tellDir) {
-    console.error(pc.red('No Tell portfolio found. Run "tell init" first.'));
-    process.exit(1);
-  }
+  const tellDir = ensurePortfolio();
   return new FileStore(tellDir);
 }
 
@@ -27,10 +25,15 @@ const addCmd = new Command('add')
       description,
     });
 
-    console.log(pc.green('Connection added:'));
-    console.log(`  ID:   ${pc.bold(conn.id)}`);
-    console.log(`  Type: ${connectionTypeLabel(conn.type)}`);
-    console.log(`  Bets: ${betA} <-> ${betB}`);
+    console.log();
+    console.log(box([
+      `${pc.green(symbols.success)} ${pc.bold('Connection added')}`,
+      '',
+      `  ${pc.dim('ID')}   ${pc.bold(conn.id)}`,
+      `  ${pc.dim('Type')} ${connectionTypeLabel(conn.type)}`,
+      `  ${pc.dim('Bets')} ${betA} ${symbols.arrow} ${betB}`,
+    ], { borderColor: pc.green }));
+    console.log();
   });
 
 const listCmd = new Command('list')
@@ -44,9 +47,10 @@ const listCmd = new Command('list')
       return;
     }
 
+    console.log();
     for (const c of connections) {
-      console.log(`  ${pc.bold(c.id)}  ${connectionTypeLabel(c.type)}  ${c.bet_ids.join(' <-> ')}`);
-      console.log(`  ${c.description}`);
+      console.log(`  ${symbols.bullet} ${pc.bold(c.id)}  ${connectionTypeLabel(c.type)}  ${c.bet_ids.join(` ${symbols.arrow} `)}`);
+      console.log(`    ${c.description}`);
       console.log();
     }
   });

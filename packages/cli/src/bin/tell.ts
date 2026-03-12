@@ -1,4 +1,5 @@
 import { Command } from 'commander';
+import { showBanner } from '../output/banner.js';
 import { initCommand } from '../commands/init.js';
 import { betCommand } from '../commands/bet.js';
 import { assumeCommand } from '../commands/assume.js';
@@ -18,7 +19,11 @@ import { pullCommand } from '../commands/pull.js';
 const program = new Command()
   .name('tell')
   .description('The Tell Protocol CLI — encode strategic intent')
-  .version('0.2.0');
+  .version('0.2.0')
+  .action(() => {
+    showBanner();
+    program.outputHelp();
+  });
 
 program.addCommand(initCommand);
 program.addCommand(betCommand);

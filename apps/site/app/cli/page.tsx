@@ -194,7 +194,7 @@ export default function CLIPage() {
           <p className="mt-2 text-navy-500">
             Running <code className="rounded bg-navy-100 px-1 py-0.5 text-sm text-navy-700">tell init</code> creates
             a <code className="rounded bg-navy-100 px-1 py-0.5 text-sm text-navy-700">.tell/</code> directory
-            designed for git-friendly version control.
+            designed for clean version control.
           </p>
           <div className="mt-6 overflow-hidden rounded-xl border border-navy-200 bg-navy-950 p-5">
             <pre className="text-sm leading-relaxed text-navy-300">
@@ -210,7 +210,7 @@ export default function CLIPage() {
           </div>
           <p className="mt-4 text-sm text-navy-400">
             Evidence uses JSONL format (one JSON object per line) so that appends produce
-            clean single-line git diffs.
+            clean single-line diffs.
           </p>
         </div>
       </section>

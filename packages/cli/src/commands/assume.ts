@@ -1,14 +1,13 @@
 import { Command } from 'commander';
 import pc from 'picocolors';
-import { FileStore, resolveTellDir } from '../store/file-store.js';
-import { colorStatus, timeAgo, truncate } from '../output/format.js';
+import { FileStore } from '../store/file-store.js';
+import { colorStatus, timeAgo, truncate, ensurePortfolio, formatSuccess } from '../output/format.js';
+import { box } from '../output/box.js';
+import { symbols } from '../output/symbols.js';
+import { nextSteps } from '../output/hints.js';
 
 function getStore(): FileStore {
-  const tellDir = resolveTellDir();
-  if (!tellDir) {
-    console.error(pc.red('No Tell portfolio found. Run "tell init" first.'));
-    process.exit(1);
-  }
+  const tellDir = ensurePortfolio();
   return new FileStore(tellDir);
 }
 
@@ -24,12 +23,19 @@ const addCmd = new Command('add')
       evidence_threshold: opts.threshold,
     });
 
-    console.log(pc.green('Assumption added:'));
-    console.log(`  ID:        ${pc.bold(assumption.id)}`);
-    console.log(`  Statement: ${statement}`);
-    console.log(`  Bet:       ${betId}`);
     console.log();
-    console.log(pc.dim(`Next: tell evidence add ${assumption.id} --signal supports "Your evidence"`));
+    console.log(box([
+      `${pc.green(symbols.success)} ${pc.bold('Assumption added')}`,
+      '',
+      `  ${pc.dim('ID')}        ${pc.bold(assumption.id)}`,
+      `  ${pc.dim('Statement')} ${statement}`,
+      `  ${pc.dim('Bet')}       ${betId}`,
+    ], { borderColor: pc.green }));
+    console.log();
+    console.log(nextSteps([
+      `tell evidence add ${assumption.id} --signal supports "Your evidence"`,
+    ]));
+    console.log();
   });
 
 const listCmd = new Command('list')
@@ -44,11 +50,12 @@ const listCmd = new Command('list')
       return;
     }
 
+    console.log();
     for (const a of assumptions) {
       const evCount = a.evidence.length;
-      console.log(`  ${pc.bold(a.id)}  ${colorStatus(a.status)}  ${timeAgo(a.last_signal_at)}`);
-      console.log(`  ${truncate(a.statement, 80)}`);
-      console.log(`  ${pc.dim(`${evCount} evidence record${evCount !== 1 ? 's' : ''}`)}`);
+      console.log(`  ${symbols.bullet} ${pc.bold(a.id)}  ${colorStatus(a.status)}  ${timeAgo(a.last_signal_at)}`);
+      console.log(`    ${truncate(a.statement, 76)}`);
+      console.log(`    ${pc.dim(`${evCount} evidence record${evCount !== 1 ? 's' : ''}`)}`);
       console.log();
     }
   });
@@ -60,7 +67,7 @@ const linkCmd = new Command('link')
   .action(async (assumptionId, betId) => {
     const store = getStore();
     await store.linkAssumptionToBet(assumptionId, betId);
-    console.log(pc.green(`Assumption ${assumptionId} linked to bet ${betId}`));
+    console.log(formatSuccess(`Assumption ${pc.bold(assumptionId)} ${symbols.arrow} bet ${pc.bold(betId)}`));
   });
 
 export const assumeCommand = new Command('assume')

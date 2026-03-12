@@ -7,6 +7,11 @@ import {
   readAuthCredentials,
   extractHost,
 } from '../sync/config.js';
+import { box } from '../output/box.js';
+import { symbols } from '../output/symbols.js';
+import { createSpinner } from '../output/spinner.js';
+import { formatSuccess, formatError } from '../output/format.js';
+import { nextSteps } from '../output/hints.js';
 
 const DEFAULT_HOST = 'https://app.apophenic.com';
 
@@ -16,7 +21,6 @@ const loginCommand = new Command('login')
   .action(async (opts) => {
     const host = opts.host.replace(/\/+$/, '');
     const hostName = extractHost(host);
-    console.log(pc.dim(`Authenticating with ${hostName}...`));
 
     const client = new SyncClient(host);
 
@@ -25,14 +29,18 @@ const loginCommand = new Command('login')
       const { device_code, verification_url } = await client.deviceAuthInit();
 
       console.log();
-      console.log(pc.bold('Open this URL in your browser:'));
-      console.log(pc.cyan(verification_url));
+      console.log(box([
+        pc.bold('Open this URL in your browser:'),
+        pc.cyan(verification_url),
+        '',
+        `Enter code: ${pc.bold(pc.yellow(device_code))}`,
+      ], { title: `Login ${symbols.arrow} ${hostName}`, borderColor: pc.cyan }));
       console.log();
-      console.log(`Enter code: ${pc.bold(pc.yellow(device_code))}`);
-      console.log();
-      console.log(pc.dim('Waiting for authentication...'));
 
-      // Step 2: Poll for completion
+      // Step 2: Poll for completion with spinner
+      const spinner = createSpinner('Waiting for authentication...');
+      spinner.start();
+
       const maxAttempts = 60; // 5 minutes at 5s intervals
       for (let i = 0; i < maxAttempts; i++) {
         await new Promise((resolve) => setTimeout(resolve, 5000));
@@ -41,21 +49,21 @@ const loginCommand = new Command('login')
 
         if (result.status === 'complete' && result.token) {
           await saveHostToken(hostName, result.token, result.user_email);
-          console.log(pc.green(`Authenticated as ${result.user_email || 'user'}`));
-          console.log(pc.dim(`Credentials saved for ${hostName}`));
+          spinner.succeed(`Authenticated as ${result.user_email || 'user'}`);
+          console.log(pc.dim(`  Credentials saved for ${hostName}`));
           return;
         }
 
         if (result.status === 'expired') {
-          console.error(pc.red('Authentication expired. Please try again.'));
+          spinner.fail('Authentication expired');
           process.exit(1);
         }
       }
 
-      console.error(pc.red('Authentication timed out. Please try again.'));
+      spinner.fail('Authentication timed out');
       process.exit(1);
     } catch (err) {
-      console.error(pc.red(`Authentication failed: ${(err as Error).message}`));
+      console.error(formatError(`Authentication failed: ${(err as Error).message}`));
       process.exit(1);
     }
   });
@@ -66,7 +74,7 @@ const logoutCommand = new Command('logout')
   .action(async (opts) => {
     const hostName = extractHost(opts.host);
     await removeHostToken(hostName);
-    console.log(pc.green(`Logged out from ${hostName}`));
+    console.log(formatSuccess(`Logged out from ${hostName}`));
   });
 
 const statusCommand = new Command('status')
@@ -77,16 +85,20 @@ const statusCommand = new Command('status')
 
     if (hosts.length === 0) {
       console.log(pc.dim('Not authenticated with any hosts.'));
-      console.log(pc.dim('Run "tell auth login" to authenticate.'));
+      console.log();
+      console.log(nextSteps(['tell auth login']));
+      console.log();
       return;
     }
 
+    console.log();
     console.log(pc.bold('Authenticated hosts:'));
     for (const [host, info] of hosts) {
       const email = info.user_email ? ` (${info.user_email})` : '';
       const date = new Date(info.created_at).toLocaleDateString();
-      console.log(`  ${pc.green(host)}${email} — since ${date}`);
+      console.log(`  ${pc.green(symbols.active)} ${pc.green(host)}${email} ${pc.dim(`${symbols.dash} since ${date}`)}`);
     }
+    console.log();
   });
 
 export const authCommand = new Command('auth')

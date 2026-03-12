@@ -1,27 +1,26 @@
 import { Command } from 'commander';
 import pc from 'picocolors';
 import type { Evidence } from '@tell-protocol/core';
-import { FileStore, resolveTellDir } from '../store/file-store.js';
+import { FileStore } from '../store/file-store.js';
 import { getRemote, setRemotePortfolioId, extractHost } from '../sync/config.js';
 import { SyncClient } from '../sync/client.js';
 import type { SyncPayload } from '../sync/client.js';
+import { ensurePortfolio, formatSuccess, formatError } from '../output/format.js';
+import { createSpinner } from '../output/spinner.js';
+import { symbols } from '../output/symbols.js';
 
 export const pushCommand = new Command('push')
   .description('Push this portfolio to a remote platform')
   .argument('[remote]', 'Remote name', 'origin')
   .action(async (remoteName: string) => {
-    const tellDir = resolveTellDir();
-    if (!tellDir) {
-      console.error(pc.red('No Tell portfolio found. Run "tell init" first.'));
-      process.exit(1);
-    }
+    const tellDir = ensurePortfolio();
 
     // Resolve remote
     let remote;
     try {
       remote = await getRemote(tellDir, remoteName);
     } catch {
-      console.error(pc.red(`Remote "${remoteName}" not found. Run "tell remote add ${remoteName} <url>" first.`));
+      console.error(formatError(`Remote "${remoteName}" not found. Run "tell remote add ${remoteName} <url>" first.`));
       process.exit(1);
     }
 
@@ -41,8 +40,10 @@ export const pushCommand = new Command('push')
 
     const payload: SyncPayload = { portfolio, evidence };
     const client = new SyncClient(remote.url);
+    const hostName = extractHost(remote.url);
 
-    console.log(pc.dim(`Pushing to ${extractHost(remote.url)}...`));
+    const spinner = createSpinner(`Pushing to ${hostName}...`);
+    spinner.start();
 
     try {
       const result = await client.push(payload, remote.portfolio_id);
@@ -52,17 +53,18 @@ export const pushCommand = new Command('push')
         await setRemotePortfolioId(tellDir, remoteName, result.portfolio_id);
       }
 
-      if (result.created) {
-        console.log(pc.green(`Portfolio created on remote (${result.portfolio_id})`));
-      } else {
-        console.log(pc.green(`Portfolio synced to version ${result.version}`));
-      }
-
       const betCount = portfolio.bets.length;
       const evidenceCount = Object.values(evidence).reduce((sum, e) => sum + e.length, 0);
+
+      if (result.created) {
+        spinner.succeed(`Portfolio created on remote (${result.portfolio_id})`);
+      } else {
+        spinner.succeed(`Portfolio synced to version ${result.version}`);
+      }
       console.log(pc.dim(`  ${betCount} bets, ${evidenceCount} evidence records pushed`));
     } catch (err) {
-      console.error(pc.red(`Push failed: ${(err as Error).message}`));
+      spinner.fail('Push failed');
+      console.error(formatError((err as Error).message));
       process.exit(1);
     }
   });

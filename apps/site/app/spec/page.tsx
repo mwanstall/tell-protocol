@@ -141,11 +141,11 @@ export default function SpecPage() {
                 </p>
                 <p>
                   The protocol serves a single purpose: to give strategy a format.
-                  Just as Git gave code a standard for tracking changes and OpenAPI
-                  gave APIs a standard for describing interfaces, Tell gives
-                  strategic intent a standard for encoding what an organisation is
-                  betting on and what evidence says about whether those bets are
-                  working.
+                  Just as GAAP gave accounting a standard for reporting finances
+                  and OpenAPI gave APIs a standard for describing interfaces, Tell
+                  gives strategic intent a standard for encoding what an
+                  organisation is betting on and what evidence says about whether
+                  those bets are working.
                 </p>
                 <p>
                   Tell is designed to be useful across a range of implementations —
@@ -296,7 +296,7 @@ export default function SpecPage() {
                 <EntityCard
                   name="Scenario"
                   letter="S"
-                  description='A hypothetical modification to the portfolio — the strategic equivalent of a Git branch. Scenarios allow "what if" reasoning without altering the live model.'
+                  description='A hypothetical modification to the portfolio — a sandbox for "what if" reasoning without altering the live model.'
                   fields={[
                     { name: 'id', type: 'string', note: 'Unique identifier' },
                     { name: 'name', type: 'string', note: 'Descriptive name' },
@@ -566,9 +566,8 @@ export default function SpecPage() {
                 </p>
                 <p>
                   Level 3 (Platform) implementations support version history and
-                  portfolio diffing — the ability to compare any two versions and see
-                  what changed. This is the strategic equivalent of{' '}
-                  <code className="text-xs text-amber-600">git diff</code>.
+                  portfolio diffing — the ability to compare any two versions and
+                  see exactly what changed in the strategic model.
                 </p>
               </div>
             </section>

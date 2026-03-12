@@ -1,15 +1,16 @@
 import { Command } from 'commander';
 import pc from 'picocolors';
-import { FileStore, resolveTellDir } from '../store/file-store.js';
-import { colorStatus, confidenceBar, truncate, timeAgo, header } from '../output/format.js';
+import { FileStore } from '../store/file-store.js';
+import { colorStatus, confidenceBar, truncate, ensurePortfolio, formatSuccess, formatError } from '../output/format.js';
+import { box } from '../output/box.js';
+import { symbols } from '../output/symbols.js';
+import { nextSteps } from '../output/hints.js';
+import { section } from '../output/box.js';
 import type { BetStatus, InvestmentStage } from '@tell-protocol/core';
+import { parseHorizon } from '../utils/parse-horizon.js';
 
 function getStore(): FileStore {
-  const tellDir = resolveTellDir();
-  if (!tellDir) {
-    console.error(pc.red('No Tell portfolio found. Run "tell init" first.'));
-    process.exit(1);
-  }
+  const tellDir = ensurePortfolio();
   return new FileStore(tellDir);
 }
 
@@ -22,22 +23,7 @@ const addCmd = new Command('add')
   .action(async (thesis, opts) => {
     const store = getStore();
 
-    // Parse time horizon
-    let time_horizon;
-    if (opts.horizon) {
-      const now = new Date();
-      const match = opts.horizon.match(/^(\d+)(d|w|m|y)$/);
-      if (match) {
-        const [, num, unit] = match;
-        const target = new Date(now);
-        const n = parseInt(num);
-        if (unit === 'd') target.setDate(target.getDate() + n);
-        else if (unit === 'w') target.setDate(target.getDate() + n * 7);
-        else if (unit === 'm') target.setMonth(target.getMonth() + n);
-        else if (unit === 'y') target.setFullYear(target.getFullYear() + n);
-        time_horizon = { start: now.toISOString(), target: target.toISOString() };
-      }
-    }
+    const time_horizon = parseHorizon(opts.horizon);
 
     const bet = await store.addBet({
       thesis,
@@ -48,12 +34,21 @@ const addCmd = new Command('add')
       time_horizon,
     });
 
-    console.log(pc.green('Bet created:'));
-    console.log(`  ID:     ${pc.bold(bet.id)}`);
-    console.log(`  Thesis: ${thesis}`);
-    if (time_horizon) console.log(`  Target: ${new Date(time_horizon.target).toLocaleDateString()}`);
+    const lines = [
+      `${pc.green(symbols.success)} ${pc.bold('Bet created')}`,
+      '',
+      `  ${pc.dim('ID')}     ${pc.bold(bet.id)}`,
+      `  ${pc.dim('Thesis')} ${thesis}`,
+    ];
+    if (time_horizon) lines.push(`  ${pc.dim('Target')} ${new Date(time_horizon.target).toLocaleDateString()}`);
+
     console.log();
-    console.log(pc.dim(`Next: tell assume add ${bet.id} "Your assumption here"`));
+    console.log(box(lines, { borderColor: pc.green }));
+    console.log();
+    console.log(nextSteps([
+      `tell assume add ${bet.id} "Your assumption here"`,
+    ]));
+    console.log();
   });
 
 const listCmd = new Command('list')
@@ -63,19 +58,22 @@ const listCmd = new Command('list')
     const bets = await store.getBets();
 
     if (bets.length === 0) {
-      console.log(pc.dim('No bets yet. Run "tell bet add" to create one.'));
+      console.log(pc.dim('No bets yet.'));
+      console.log();
+      console.log(nextSteps(['tell bet add "Your thesis here"']));
+      console.log();
       return;
     }
 
-    console.log(header('Bets'));
     console.log();
+    console.log(section('Bets'));
 
     for (const bet of bets) {
       const asmCount = bet.assumptions.length;
       const stageLabel = bet.stage ? pc.magenta(bet.stage) + '  ' : '';
-      console.log(`  ${pc.bold(bet.id)}  ${colorStatus(bet.status)}  ${stageLabel}${confidenceBar(bet.confidence)}`);
-      console.log(`  ${truncate(bet.thesis, 80)}`);
-      console.log(`  ${pc.dim(`${asmCount} assumption${asmCount !== 1 ? 's' : ''}`)}`);
+      console.log(`  ${symbols.bullet} ${pc.bold(bet.id)}  ${colorStatus(bet.status)}  ${stageLabel}${confidenceBar(bet.confidence)}`);
+      console.log(`    ${truncate(bet.thesis, 76)}`);
+      console.log(`    ${pc.dim(`${asmCount} assumption${asmCount !== 1 ? 's' : ''}`)}`);
       console.log();
     }
   });
@@ -86,7 +84,7 @@ const killCmd = new Command('kill')
   .action(async (id) => {
     const store = getStore();
     const bet = await store.updateBet(id, { status: 'killed' as BetStatus });
-    console.log(pc.red(`Bet killed: ${bet.id}`));
+    console.log(formatError(`Bet killed: ${pc.bold(bet.id)}`));
   });
 
 const succeedCmd = new Command('succeed')
@@ -95,7 +93,7 @@ const succeedCmd = new Command('succeed')
   .action(async (id) => {
     const store = getStore();
     const bet = await store.updateBet(id, { status: 'succeeded' as BetStatus });
-    console.log(pc.cyan(`Bet succeeded: ${bet.id}`));
+    console.log(formatSuccess(`Bet succeeded: ${pc.bold(bet.id)}`));
   });
 
 const stageCmd = new Command('stage')
@@ -105,12 +103,12 @@ const stageCmd = new Command('stage')
   .action(async (id, stage) => {
     const validStages = ['exploring', 'validating', 'committed', 'scaling'];
     if (!validStages.includes(stage)) {
-      console.error(pc.red(`Invalid stage: ${stage}. Must be one of: ${validStages.join(', ')}`));
+      console.error(formatError(`Invalid stage: ${stage}. Must be one of: ${validStages.join(', ')}`));
       process.exit(1);
     }
     const store = getStore();
     const bet = await store.updateBet(id, { stage: stage as InvestmentStage });
-    console.log(`Bet ${pc.bold(bet.id)} stage set to ${pc.magenta(stage)}`);
+    console.log(formatSuccess(`Bet ${pc.bold(bet.id)} stage set to ${pc.magenta(stage)}`));
   });
 
 export const betCommand = new Command('bet')
