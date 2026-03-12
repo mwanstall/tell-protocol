@@ -7,8 +7,8 @@ import { symbols, experimentStatusSymbol, signalSymbol } from '../output/symbols
 import { nextSteps } from '../output/hints.js';
 import type { ExperimentStatus } from '@tell-protocol/core';
 
-function getStore(): FileStore {
-  const tellDir = ensurePortfolio();
+async function getStore(): Promise<FileStore> {
+  const tellDir = await ensurePortfolio();
   return new FileStore(tellDir);
 }
 
@@ -24,7 +24,7 @@ const addCmd = new Command('add')
   .option('--timebox <duration>', 'Time box (e.g., "2 weeks")')
   .option('--owner <owner>', 'Experiment owner')
   .action(async (betId, hypothesis, opts) => {
-    const store = getStore();
+    const store = await getStore();
     const bet = await store.getBet(betId);
     if (!bet) {
       console.error(formatError(`Bet not found: ${betId}`));
@@ -71,7 +71,7 @@ const listCmd = new Command('list')
   .description('List experiments')
   .option('--bet <id>', 'Filter by bet ID')
   .action(async (opts) => {
-    const store = getStore();
+    const store = await getStore();
     const experiments = opts.bet
       ? await store.getExperimentsForBet(opts.bet)
       : await store.getExperiments();
@@ -102,7 +102,7 @@ const startCmd = new Command('start')
   .description('Start a planned experiment')
   .argument('<id>', 'Experiment ID')
   .action(async (id) => {
-    const store = getStore();
+    const store = await getStore();
     const experiment = await store.updateExperiment(id, { status: 'running' as ExperimentStatus });
     console.log(`${pc.blue(symbols.active)} Experiment started: ${pc.bold(experiment.id)}`);
   });
@@ -113,7 +113,7 @@ const concludeCmd = new Command('conclude')
   .requiredOption('--signal <signal>', 'Outcome signal: supports, weakens, or neutral')
   .requiredOption('--summary <summary>', 'Summary of the outcome')
   .action(async (id, opts) => {
-    const store = getStore();
+    const store = await getStore();
     const experiment = await store.updateExperiment(id, {
       status: 'concluded' as ExperimentStatus,
       outcome: {
@@ -139,7 +139,7 @@ const abandonCmd = new Command('abandon')
   .description('Abandon an experiment')
   .argument('<id>', 'Experiment ID')
   .action(async (id) => {
-    const store = getStore();
+    const store = await getStore();
     const experiment = await store.updateExperiment(id, { status: 'abandoned' as ExperimentStatus });
     console.log(formatError(`Experiment abandoned: ${pc.bold(experiment.id)}`));
   });

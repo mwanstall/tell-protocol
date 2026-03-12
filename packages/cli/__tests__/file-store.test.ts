@@ -8,6 +8,7 @@ import { FileStore, resolveTellDir } from '../src/index.js';
 describe('FileStore', () => {
   let tempDir: string;
   let store: FileStore;
+  const portfolioSlug = 'test-portfolio';
 
   beforeEach(async () => {
     tempDir = await mkdtemp(join(tmpdir(), 'tell-test-'));
@@ -18,11 +19,14 @@ describe('FileStore', () => {
     await rm(tempDir, { recursive: true, force: true });
   });
 
-  it('creates .tell directory structure on init', () => {
-    expect(existsSync(join(tempDir, '.tell', 'portfolio.tell.json'))).toBe(true);
-    expect(existsSync(join(tempDir, '.tell', 'evidence'))).toBe(true);
-    expect(existsSync(join(tempDir, '.tell', 'history'))).toBe(true);
-    expect(existsSync(join(tempDir, '.tell', 'history', 'v001.tell.json'))).toBe(true);
+  it('creates multi-portfolio directory structure on init', () => {
+    const portfolioDir = join(tempDir, '.tell', 'portfolios', portfolioSlug);
+    expect(existsSync(join(portfolioDir, 'portfolio.tell.json'))).toBe(true);
+    expect(existsSync(join(portfolioDir, 'evidence'))).toBe(true);
+    expect(existsSync(join(portfolioDir, 'history'))).toBe(true);
+    expect(existsSync(join(portfolioDir, 'history', 'v001.tell.json'))).toBe(true);
+    // Active file should be set
+    expect(existsSync(join(tempDir, '.tell', 'active'))).toBe(true);
   });
 
   it('reads portfolio with correct initial state', async () => {
@@ -131,7 +135,8 @@ describe('FileStore', () => {
 
   it('saves version history snapshots', async () => {
     await store.addBet({ thesis: 'Version test', status: 'active', assumptions: [] });
-    expect(existsSync(join(tempDir, '.tell', 'history', 'v002.tell.json'))).toBe(true);
+    const portfolioDir = join(tempDir, '.tell', 'portfolios', portfolioSlug);
+    expect(existsSync(join(portfolioDir, 'history', 'v002.tell.json'))).toBe(true);
   });
 });
 
@@ -147,13 +152,16 @@ describe('resolveTellDir', () => {
     await rm(tempDir, { recursive: true, force: true });
   });
 
-  it('finds .tell dir in current directory', () => {
+  it('finds active portfolio dir via resolveTellDir', () => {
     const result = resolveTellDir(tempDir);
-    expect(result).toBe(join(tempDir, '.tell'));
+    expect(result).toBe(join(tempDir, '.tell', 'portfolios', 'resolve-test'));
   });
 
-  it('returns null when no .tell dir exists', () => {
-    const result = resolveTellDir(tmpdir());
+  it('returns null when no .tell dir exists', async () => {
+    // Create a temp dir and verify no .tell anywhere in its ancestry
+    // by starting from the filesystem root
+    const root = process.platform === 'win32' ? 'C:\\' : '/';
+    const result = resolveTellDir(root);
     expect(result).toBeNull();
   });
 });

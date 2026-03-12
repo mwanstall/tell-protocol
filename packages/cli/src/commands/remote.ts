@@ -10,7 +10,7 @@ const addCommand = new Command('add')
   .argument('<name>', 'Remote name (e.g., "origin")')
   .argument('<url>', 'Platform URL (e.g., "https://app.apophenic.com")')
   .action(async (name: string, url: string) => {
-    const tellDir = ensurePortfolio();
+    const tellDir = await ensurePortfolio();
     try {
       await addRemote(tellDir, name, url);
       console.log(formatSuccess(`Remote "${name}" added: ${url}`));
@@ -24,7 +24,7 @@ const removeCmd = new Command('remove')
   .description('Remove a remote')
   .argument('<name>', 'Remote name')
   .action(async (name: string) => {
-    const tellDir = ensurePortfolio();
+    const tellDir = await ensurePortfolio();
     try {
       await removeRemote(tellDir, name);
       console.log(formatSuccess(`Remote "${name}" removed`));
@@ -37,7 +37,7 @@ const removeCmd = new Command('remove')
 const listCommand = new Command('list')
   .description('List configured remotes')
   .action(async () => {
-    const tellDir = ensurePortfolio();
+    const tellDir = await ensurePortfolio();
     const config = await readTellConfig(tellDir);
 
     if (config.remotes.length === 0) {

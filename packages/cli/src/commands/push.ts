@@ -13,7 +13,7 @@ export const pushCommand = new Command('push')
   .description('Push this portfolio to a remote platform')
   .argument('[remote]', 'Remote name', 'origin')
   .action(async (remoteName: string) => {
-    const tellDir = ensurePortfolio();
+    const tellDir = await ensurePortfolio();
 
     // Resolve remote
     let remote;

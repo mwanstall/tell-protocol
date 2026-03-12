@@ -3,6 +3,7 @@ import pc from 'picocolors';
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { FileStore } from '../store/file-store.js';
+import { slugify } from '../utils/slugify.js';
 import { box } from '../output/box.js';
 import { symbols } from '../output/symbols.js';
 import { nextSteps } from '../output/hints.js';
@@ -14,10 +15,12 @@ export const initCommand = new Command('init')
   .option('-o, --org <organisation>', 'Organisation name', 'My Organisation')
   .action(async (opts) => {
     const cwd = process.cwd();
-    const tellDir = join(cwd, '.tell');
+    const slug = slugify(opts.name);
+    const portfolioDir = join(cwd, '.tell', 'portfolios', slug);
 
-    if (existsSync(join(tellDir, 'portfolio.tell.json'))) {
-      console.log(formatWarning('A Tell portfolio already exists in this directory.'));
+    // Check if this exact portfolio already exists
+    if (existsSync(join(portfolioDir, 'portfolio.tell.json'))) {
+      console.log(formatWarning(`A portfolio named "${slug}" already exists in this directory.`));
       return;
     }
 
@@ -31,7 +34,7 @@ export const initCommand = new Command('init')
       `  ${pc.dim('Name')}         ${pc.bold(portfolio.name)}`,
       `  ${pc.dim('Organisation')} ${portfolio.organisation}`,
       `  ${pc.dim('Version')}      ${portfolio.version}`,
-      `  ${pc.dim('Directory')}    ${pc.dim('.tell/')}`,
+      `  ${pc.dim('Directory')}    ${pc.dim(`.tell/portfolios/${slug}/`)}`,
     ], { borderColor: pc.green }));
     // Launch interactive onboarding wizard in TTY environments
     if (process.stdout.isTTY) {

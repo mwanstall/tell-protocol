@@ -17,11 +17,13 @@ import { authCommand } from '../commands/auth.js';
 import { remoteCommand } from '../commands/remote.js';
 import { pushCommand } from '../commands/push.js';
 import { pullCommand } from '../commands/pull.js';
+import { portfolioCommand } from '../commands/portfolio.js';
+import { resolveRootTellDir, getActivePortfolioName } from '../store/file-store.js';
 
 const program = new Command()
   .name('tell')
   .description('The Tell Protocol CLI — encode strategic intent')
-  .version('0.3.6')
+  .version('0.4.0')
   .exitOverride() // throw instead of process.exit so the REPL survives
   .action(() => {
     // When invoked with no args, start interactive mode (TTY) or show help (non-TTY)
@@ -50,6 +52,7 @@ program.addCommand(authCommand);
 program.addCommand(remoteCommand);
 program.addCommand(pushCommand);
 program.addCommand(pullCommand);
+program.addCommand(portfolioCommand);
 
 // ── Tokenizer ────────────────────────────────────────────────────
 // Splits input respecting quoted strings: bet add "My thesis here"
@@ -88,12 +91,22 @@ function startRepl(): void {
   console.log(`  ${pc.dim('Type a command, or')} ${pc.bold('help')} ${pc.dim('for available commands.')} ${pc.bold('exit')} ${pc.dim('to quit.')}`);
   console.log();
 
-  const PROMPT = `${pc.cyan('tell')} ${pc.dim('>')} `;
+  async function getPrompt(): Promise<string> {
+    const rootDir = resolveRootTellDir();
+    if (rootDir) {
+      const active = await getActivePortfolioName(rootDir);
+      if (active) {
+        return `${pc.cyan('tell')} ${pc.dim('(')}${pc.yellow(active)}${pc.dim(')')} ${pc.dim('>')} `;
+      }
+    }
+    return `${pc.cyan('tell')} ${pc.dim('>')} `;
+  }
 
   // Create a fresh readline for each prompt cycle.
   // This ensures interactive sub-commands (inquirer prompts) get exclusive
   // control of stdin — a paused readline still intercepts keystrokes.
-  function nextPrompt(): void {
+  async function nextPrompt(): Promise<void> {
+    const PROMPT = await getPrompt();
     const rl = createInterface({
       input: process.stdin,
       output: process.stdout,

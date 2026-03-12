@@ -13,7 +13,7 @@ export const pullCommand = new Command('pull')
   .argument('[remote]', 'Remote name', 'origin')
   .option('-f, --force', 'Overwrite local changes without confirmation')
   .action(async (remoteName: string, opts) => {
-    const tellDir = ensurePortfolio();
+    const tellDir = await ensurePortfolio();
 
     // Resolve remote
     let remote;

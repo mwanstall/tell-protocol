@@ -1,7 +1,7 @@
 import pc from 'picocolors';
 import type { BetStatus, AssumptionStatus, ConnectionType } from '@tell-protocol/core';
 import { symbols, statusSymbol } from './symbols.js';
-import { resolveTellDir } from '../store/file-store.js';
+import { resolveActivePortfolioDir, resolveRootTellDir } from '../store/file-store.js';
 
 export function colorStatus(status: BetStatus | AssumptionStatus): string {
   const sym = statusSymbol(status);
@@ -100,11 +100,20 @@ export function formatWarning(msg: string): string {
   return `${pc.yellow(symbols.warning)} ${msg}`;
 }
 
-export function ensurePortfolio(): string {
-  const tellDir = resolveTellDir();
+export async function ensurePortfolio(): Promise<string> {
+  const tellDir = await resolveActivePortfolioDir();
   if (!tellDir) {
     console.error(formatError('No Tell portfolio found. Run "tell init" first.'));
     process.exit(1);
   }
   return tellDir;
+}
+
+export function ensureRootTellDir(): string {
+  const rootDir = resolveRootTellDir();
+  if (!rootDir) {
+    console.error(formatError('No Tell portfolio found. Run "tell init" first.'));
+    process.exit(1);
+  }
+  return rootDir;
 }

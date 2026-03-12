@@ -9,8 +9,8 @@ import { section } from '../output/box.js';
 import type { BetStatus, InvestmentStage } from '@tell-protocol/core';
 import { parseHorizon } from '../utils/parse-horizon.js';
 
-function getStore(): FileStore {
-  const tellDir = ensurePortfolio();
+async function getStore(): Promise<FileStore> {
+  const tellDir = await ensurePortfolio();
   return new FileStore(tellDir);
 }
 
@@ -21,7 +21,7 @@ const addCmd = new Command('add')
   .option('--stage <stage>', 'Investment stage: exploring, validating, committed, scaling')
   .option('--owner <owner>', 'Bet owner')
   .action(async (thesis, opts) => {
-    const store = getStore();
+    const store = await getStore();
 
     const time_horizon = parseHorizon(opts.horizon);
 
@@ -54,7 +54,7 @@ const addCmd = new Command('add')
 const listCmd = new Command('list')
   .description('List all bets')
   .action(async () => {
-    const store = getStore();
+    const store = await getStore();
     const bets = await store.getBets();
 
     if (bets.length === 0) {
@@ -82,7 +82,7 @@ const killCmd = new Command('kill')
   .description('Kill a bet')
   .argument('<id>', 'Bet ID')
   .action(async (id) => {
-    const store = getStore();
+    const store = await getStore();
     const bet = await store.updateBet(id, { status: 'killed' as BetStatus });
     console.log(formatError(`Bet killed: ${pc.bold(bet.id)}`));
   });
@@ -91,7 +91,7 @@ const succeedCmd = new Command('succeed')
   .description('Mark a bet as succeeded')
   .argument('<id>', 'Bet ID')
   .action(async (id) => {
-    const store = getStore();
+    const store = await getStore();
     const bet = await store.updateBet(id, { status: 'succeeded' as BetStatus });
     console.log(formatSuccess(`Bet succeeded: ${pc.bold(bet.id)}`));
   });
@@ -106,7 +106,7 @@ const stageCmd = new Command('stage')
       console.error(formatError(`Invalid stage: ${stage}. Must be one of: ${validStages.join(', ')}`));
       process.exit(1);
     }
-    const store = getStore();
+    const store = await getStore();
     const bet = await store.updateBet(id, { stage: stage as InvestmentStage });
     console.log(formatSuccess(`Bet ${pc.bold(bet.id)} stage set to ${pc.magenta(stage)}`));
   });
