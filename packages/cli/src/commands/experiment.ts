@@ -1,7 +1,7 @@
 import { Command } from 'commander';
 import pc from 'picocolors';
 import { FileStore } from '../store/file-store.js';
-import { truncate, ensurePortfolio, formatSuccess, formatError, colorExpStatus } from '../output/format.js';
+import { truncate, ensurePortfolio, formatSuccess, formatError, colorExpStatus, CliError } from '../output/format.js';
 import { box, section } from '../output/box.js';
 import { symbols, experimentStatusSymbol, signalSymbol } from '../output/symbols.js';
 import { nextSteps } from '../output/hints.js';
@@ -27,8 +27,7 @@ const addCmd = new Command('add')
     const store = await getStore();
     const bet = await store.getBet(betId);
     if (!bet) {
-      console.error(formatError(`Bet not found: ${betId}`));
-      process.exit(1);
+      throw new CliError(`Bet not found: ${betId}`);
     }
 
     const assumptionIds = opts.assumptions

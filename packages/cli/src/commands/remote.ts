@@ -1,7 +1,7 @@
 import { Command } from 'commander';
 import pc from 'picocolors';
 import { addRemote, removeRemote, readTellConfig } from '../sync/config.js';
-import { ensurePortfolio, formatSuccess, formatError } from '../output/format.js';
+import { ensurePortfolio, formatSuccess, formatError, CliError } from '../output/format.js';
 import { symbols } from '../output/symbols.js';
 import { nextSteps } from '../output/hints.js';
 
@@ -16,7 +16,7 @@ const addCommand = new Command('add')
       console.log(formatSuccess(`Remote "${name}" added: ${url}`));
     } catch (err) {
       console.error(formatError((err as Error).message));
-      process.exit(1);
+      throw new CliError('');
     }
   });
 
@@ -30,7 +30,7 @@ const removeCmd = new Command('remove')
       console.log(formatSuccess(`Remote "${name}" removed`));
     } catch (err) {
       console.error(formatError((err as Error).message));
-      process.exit(1);
+      throw new CliError('');
     }
   });
 

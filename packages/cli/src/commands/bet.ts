@@ -1,7 +1,7 @@
 import { Command } from 'commander';
 import pc from 'picocolors';
 import { FileStore } from '../store/file-store.js';
-import { colorStatus, confidenceBar, truncate, ensurePortfolio, formatSuccess, formatError } from '../output/format.js';
+import { colorStatus, confidenceBar, truncate, ensurePortfolio, formatSuccess, formatError, CliError } from '../output/format.js';
 import { box } from '../output/box.js';
 import { symbols } from '../output/symbols.js';
 import { nextSteps } from '../output/hints.js';
@@ -103,8 +103,7 @@ const stageCmd = new Command('stage')
   .action(async (id, stage) => {
     const validStages = ['exploring', 'validating', 'committed', 'scaling'];
     if (!validStages.includes(stage)) {
-      console.error(formatError(`Invalid stage: ${stage}. Must be one of: ${validStages.join(', ')}`));
-      process.exit(1);
+      throw new CliError(`Invalid stage: ${stage}. Must be one of: ${validStages.join(', ')}`);
     }
     const store = await getStore();
     const bet = await store.updateBet(id, { stage: stage as InvestmentStage });

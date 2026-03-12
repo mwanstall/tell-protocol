@@ -19,11 +19,12 @@ import { pushCommand } from '../commands/push.js';
 import { pullCommand } from '../commands/pull.js';
 import { portfolioCommand } from '../commands/portfolio.js';
 import { resolveRootTellDir, getActivePortfolioName } from '../store/file-store.js';
+import { CliError } from '../output/format.js';
 
 const program = new Command()
   .name('tell')
   .description('The Tell Protocol CLI — encode strategic intent')
-  .version('0.4.0')
+  .version('0.4.1')
   .exitOverride() // throw instead of process.exit so the REPL survives
   .action(() => {
     // When invoked with no args, start interactive mode (TTY) or show help (non-TTY)
@@ -53,6 +54,16 @@ program.addCommand(remoteCommand);
 program.addCommand(pushCommand);
 program.addCommand(pullCommand);
 program.addCommand(portfolioCommand);
+
+// Propagate exitOverride to all nested subcommands so no command
+// can call process.exit() and kill the REPL.
+function applyExitOverride(cmd: Command): void {
+  for (const sub of cmd.commands) {
+    sub.exitOverride();
+    applyExitOverride(sub);
+  }
+}
+applyExitOverride(program);
 
 // ── Tokenizer ────────────────────────────────────────────────────
 // Splits input respecting quoted strings: bet add "My thesis here"
@@ -156,6 +167,9 @@ function startRepl(): void {
         if (err instanceof CommanderError) {
           // exitCode 0 means --help or --version was triggered (output already printed)
           // non-zero means unknown command or validation error (also already printed)
+        } else if (err instanceof CliError) {
+          // CliError = command already printed its error, just continue the REPL
+          if (err.message) console.error(pc.red(`  Error: ${err.message}`));
         } else if (err instanceof Error) {
           console.error(pc.red(`  Error: ${err.message}`));
         }
@@ -188,6 +202,11 @@ try {
   // In one-shot mode, CommanderError from exitOverride is expected for --help/--version
   if (err instanceof CommanderError) {
     process.exit(err.exitCode);
+  }
+  // CliError = command already printed its error message
+  if (err instanceof CliError) {
+    if (err.message) console.error(pc.red(`  Error: ${err.message}`));
+    process.exit(1);
   }
   throw err;
 }

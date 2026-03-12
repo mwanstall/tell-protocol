@@ -2,7 +2,7 @@ import { Command } from 'commander';
 import pc from 'picocolors';
 import { readFile } from 'node:fs/promises';
 import { validateTellDocument } from '@tell-protocol/schema';
-import { formatSuccess, formatError } from '../output/format.js';
+import { formatSuccess, formatError, CliError } from '../output/format.js';
 import { symbols } from '../output/symbols.js';
 
 export const validateCommand = new Command('validate')
@@ -14,7 +14,7 @@ export const validateCommand = new Command('validate')
       data = await readFile(file, 'utf-8');
     } catch {
       console.error(formatError(`Could not read file: ${file}`));
-      process.exit(1);
+      throw new CliError('');
     }
 
     let parsed: unknown;
@@ -22,7 +22,7 @@ export const validateCommand = new Command('validate')
       parsed = JSON.parse(data);
     } catch {
       console.error(formatError('Invalid JSON'));
-      process.exit(1);
+      throw new CliError('');
     }
 
     const result = validateTellDocument(parsed);
@@ -34,6 +34,6 @@ export const validateCommand = new Command('validate')
       for (const err of result.errors) {
         console.log(`  ${symbols.bullet} ${pc.dim(err.path)} ${err.message}`);
       }
-      process.exit(1);
+      throw new CliError('');
     }
   });

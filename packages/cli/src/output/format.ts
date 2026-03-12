@@ -3,6 +3,14 @@ import type { BetStatus, AssumptionStatus, ConnectionType } from '@tell-protocol
 import { symbols, statusSymbol } from './symbols.js';
 import { resolveActivePortfolioDir, resolveRootTellDir } from '../store/file-store.js';
 
+/** Thrown by commands to signal a non-zero exit without killing the REPL. */
+export class CliError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'CliError';
+  }
+}
+
 export function colorStatus(status: BetStatus | AssumptionStatus): string {
   const sym = statusSymbol(status);
   switch (status) {
@@ -103,8 +111,7 @@ export function formatWarning(msg: string): string {
 export async function ensurePortfolio(): Promise<string> {
   const tellDir = await resolveActivePortfolioDir();
   if (!tellDir) {
-    console.error(formatError('No Tell portfolio found. Run "tell init" first.'));
-    process.exit(1);
+    throw new CliError('No Tell portfolio found. Run "tell init" first.');
   }
   return tellDir;
 }
@@ -112,8 +119,7 @@ export async function ensurePortfolio(): Promise<string> {
 export function ensureRootTellDir(): string {
   const rootDir = resolveRootTellDir();
   if (!rootDir) {
-    console.error(formatError('No Tell portfolio found. Run "tell init" first.'));
-    process.exit(1);
+    throw new CliError('No Tell portfolio found. Run "tell init" first.');
   }
   return rootDir;
 }

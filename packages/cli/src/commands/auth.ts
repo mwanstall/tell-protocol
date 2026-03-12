@@ -10,7 +10,7 @@ import {
 import { box } from '../output/box.js';
 import { symbols } from '../output/symbols.js';
 import { createSpinner } from '../output/spinner.js';
-import { formatSuccess, formatError } from '../output/format.js';
+import { formatSuccess, formatError, CliError } from '../output/format.js';
 import { nextSteps } from '../output/hints.js';
 
 const DEFAULT_HOST = 'https://app.apophenic.com';
@@ -56,15 +56,15 @@ const loginCommand = new Command('login')
 
         if (result.status === 'expired') {
           spinner.fail('Authentication expired');
-          process.exit(1);
+          throw new CliError('');
         }
       }
 
       spinner.fail('Authentication timed out');
-      process.exit(1);
+      throw new CliError('');
     } catch (err) {
       console.error(formatError(`Authentication failed: ${(err as Error).message}`));
-      process.exit(1);
+      throw new CliError('');
     }
   });
 
