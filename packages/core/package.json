@@ -1,6 +1,6 @@
 {
   "name": "@tell-protocol/core",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Core library for the Tell protocol — types, algorithms, and storage interface",
   "type": "module",
   "main": "./dist/index.cjs",
