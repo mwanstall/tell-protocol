@@ -21,7 +21,7 @@ import { pullCommand } from '../commands/pull.js';
 const program = new Command()
   .name('tell')
   .description('The Tell Protocol CLI — encode strategic intent')
-  .version('0.3.5')
+  .version('0.3.6')
   .exitOverride() // throw instead of process.exit so the REPL survives
   .action(() => {
     // When invoked with no args, start interactive mode (TTY) or show help (non-TTY)
@@ -90,70 +90,80 @@ function startRepl(): void {
 
   const PROMPT = `${pc.cyan('tell')} ${pc.dim('>')} `;
 
-  const rl = createInterface({
-    input: process.stdin,
-    output: process.stdout,
-    prompt: PROMPT,
-    terminal: true,
-  });
+  // Create a fresh readline for each prompt cycle.
+  // This ensures interactive sub-commands (inquirer prompts) get exclusive
+  // control of stdin — a paused readline still intercepts keystrokes.
+  function nextPrompt(): void {
+    const rl = createInterface({
+      input: process.stdin,
+      output: process.stdout,
+      prompt: PROMPT,
+      terminal: true,
+    });
 
-  rl.prompt();
+    let closedForCommand = false;
 
-  rl.on('line', async (line: string) => {
-    const input = line.trim();
-
-    // Empty line
-    if (!input) {
-      rl.prompt();
-      return;
-    }
-
-    // Exit commands
-    if (['exit', 'quit', '.exit', '.quit'].includes(input.toLowerCase())) {
-      console.log(pc.dim('  Goodbye.'));
-      rl.close();
-      return;
-    }
-
-    // Help shortcut
-    if (input.toLowerCase() === 'help') {
-      program.outputHelp();
-      console.log();
-      rl.prompt();
-      return;
-    }
-
-    // Pause the REPL readline so interactive sub-commands (inquirer prompts)
-    // get exclusive control of stdin — prevents the REPL from intercepting
-    // user input meant for prompts and trying to parse it as a command.
-    rl.pause();
-    process.stdin.removeAllListeners('data');
-
-    // Parse and execute command
-    const tokens = tokenize(input);
-    try {
-      await program.parseAsync(['node', 'tell', ...tokens]);
-    } catch (err) {
-      // Commander throws CommanderError for --help, unknown commands, etc.
-      // These are expected in REPL mode — just continue
-      if (err instanceof CommanderError) {
-        // exitCode 0 means --help or --version was triggered (output already printed)
-        // non-zero means unknown command or validation error (also already printed)
-      } else if (err instanceof Error) {
-        console.error(pc.red(`  Error: ${err.message}`));
-      }
-    }
-
-    console.log();
-    rl.resume();
     rl.prompt();
-  });
 
-  rl.on('close', () => {
-    console.log();
-    console.log(pc.dim('  Goodbye.'));
-    process.exit(0);
-  });
+    rl.on('line', async (line: string) => {
+      const input = line.trim();
+
+      // Empty line
+      if (!input) {
+        rl.prompt();
+        return;
+      }
+
+      // Exit commands
+      if (['exit', 'quit', '.exit', '.quit'].includes(input.toLowerCase())) {
+        console.log(pc.dim('  Goodbye.'));
+        process.exit(0);
+      }
+
+      // Help shortcut
+      if (input.toLowerCase() === 'help') {
+        program.outputHelp();
+        console.log();
+        rl.prompt();
+        return;
+      }
+
+      // Close this readline entirely so interactive sub-commands
+      // (inquirer prompts, select menus, etc.) get exclusive stdin access.
+      closedForCommand = true;
+      rl.close();
+
+      // Parse and execute command
+      const tokens = tokenize(input);
+      try {
+        await program.parseAsync(['node', 'tell', ...tokens]);
+      } catch (err) {
+        // Commander throws CommanderError for --help, unknown commands, etc.
+        // These are expected in REPL mode — just continue
+        if (err instanceof CommanderError) {
+          // exitCode 0 means --help or --version was triggered (output already printed)
+          // non-zero means unknown command or validation error (also already printed)
+        } else if (err instanceof Error) {
+          console.error(pc.red(`  Error: ${err.message}`));
+        }
+      }
+
+      console.log();
+      // Command done — create a fresh readline for the next prompt
+      nextPrompt();
+    });
+
+    rl.on('close', () => {
+      if (!closedForCommand) {
+        // Ctrl+C or Ctrl+D — user wants to exit
+        console.log();
+        console.log(pc.dim('  Goodbye.'));
+        process.exit(0);
+      }
+    });
+  }
+
+  nextPrompt();
 }
 
 // ── Entry Point ──────────────────────────────────────────────────
