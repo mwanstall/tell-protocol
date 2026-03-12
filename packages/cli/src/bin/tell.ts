@@ -21,7 +21,7 @@ import { pullCommand } from '../commands/pull.js';
 const program = new Command()
   .name('tell')
   .description('The Tell Protocol CLI — encode strategic intent')
-  .version('0.3.2')
+  .version('0.3.3')
   .exitOverride() // throw instead of process.exit so the REPL survives
   .action(() => {
     // When invoked with no args, start interactive mode (TTY) or show help (non-TTY)
