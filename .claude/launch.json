@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "tell-site",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["--filter", "tell-site", "dev"],
+      "port": 3001
+    }
+  ]
+}
