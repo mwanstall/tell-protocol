@@ -124,7 +124,15 @@ function startRepl(): void {
     }
 
     // Parse and execute command
-    const tokens = tokenize(input);
+    let tokens = tokenize(input);
+    // Strip leading 'tell' — users often type "tell status" inside the REPL
+    if (tokens[0] === 'tell') {
+      tokens = tokens.slice(1);
+    }
+    if (tokens.length === 0) {
+      rl.prompt();
+      return;
+    }
     try {
       await program.parseAsync(['node', 'tell', ...tokens]);
     } catch (err) {
