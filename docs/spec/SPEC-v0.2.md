@@ -113,7 +113,7 @@ The fundamental unit of strategic intent. A falsifiable hypothesis that the orga
 | `status` | enum | Yes | `active` \| `paused` \| `killed` \| `succeeded` |
 | `confidence` | integer (0-100) | No | Current confidence level. Derived from evidence weight or manually set. |
 | `confidence_source` | enum | No | `computed` \| `manual` \| `override` |
-| `time_horizon` | object | No | `{ "start": "ISO 8601", "target": "ISO 8601" }` |
+| `time_horizon` | object | No | **Deprecated since v0.3.** `{ "start": "ISO 8601", "target": "ISO 8601" }`. Express timelines as assumptions instead. |
 | `owner` | string | No | Contributor ID of the bet owner. |
 | `resource_allocations` | ResourceAllocation[] | No | Resources committed to this bet. |
 | `assumptions` | Assumption[] | Yes | The assumptions that must hold for the thesis to be valid. Minimum 1. |

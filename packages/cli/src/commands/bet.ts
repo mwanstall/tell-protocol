@@ -24,6 +24,10 @@ const addCmd = new Command('add')
     const store = await getStore();
 
     const time_horizon = parseHorizon(opts.horizon);
+    if (opts.horizon) {
+      console.log(pc.yellow(`\n  ${symbols.warning || '⚠'} --horizon is deprecated. Express timelines as assumptions instead.`));
+      console.log(pc.dim(`    e.g. tell assume add <bet-id> "Revenue reaches \$1M by Q3 2027"\n`));
+    }
 
     const bet = await store.addBet({
       thesis,
