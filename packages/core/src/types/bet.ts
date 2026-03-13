@@ -14,6 +14,7 @@ export interface Bet {
   stage?: InvestmentStage;
   confidence?: number;
   confidence_source?: ConfidenceSource;
+  version?: number;
   time_horizon?: TimeHorizon;
   owner?: string;
   resource_allocations?: ResourceAllocation[];
