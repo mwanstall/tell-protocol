@@ -101,8 +101,74 @@ const statusCommand = new Command('status')
     console.log();
   });
 
+// ── Token Management ──
+
+const tokensListCommand = new Command('list')
+  .description('List all CLI tokens on the remote')
+  .option('-h, --host <url>', 'Platform URL', DEFAULT_HOST)
+  .action(async (opts) => {
+    const host = opts.host.replace(/\/+$/, '');
+    const client = new SyncClient(host);
+
+    const spinner = createSpinner('Fetching tokens...');
+    spinner.start();
+
+    try {
+      const tokens = await client.listTokens();
+      spinner.stop();
+
+      if (tokens.length === 0) {
+        console.log(pc.dim('No CLI tokens found.'));
+        return;
+      }
+
+      console.log();
+      console.log(pc.bold(`CLI tokens (${tokens.length}):`));
+      for (const token of tokens) {
+        const lastUsed = token.last_used_at
+          ? `last used ${new Date(token.last_used_at).toLocaleDateString()}`
+          : 'never used';
+        const created = new Date(token.created_at).toLocaleDateString();
+        console.log(`  ${pc.green(symbols.active)} ${token.name || 'Unnamed'} ${pc.dim(`${symbols.dash} created ${created}, ${lastUsed}`)}`);
+        console.log(pc.dim(`    ID: ${token.id}`));
+      }
+      console.log();
+    } catch (err) {
+      spinner.fail('Failed to list tokens');
+      console.error(formatError((err as Error).message));
+      throw new CliError('');
+    }
+  });
+
+const tokensRevokeCommand = new Command('revoke')
+  .description('Revoke a CLI token by ID')
+  .argument('<id>', 'Token ID to revoke')
+  .option('-h, --host <url>', 'Platform URL', DEFAULT_HOST)
+  .action(async (tokenId: string, opts) => {
+    const host = opts.host.replace(/\/+$/, '');
+    const client = new SyncClient(host);
+
+    const spinner = createSpinner('Revoking token...');
+    spinner.start();
+
+    try {
+      await client.revokeToken(tokenId);
+      spinner.succeed('Token revoked');
+    } catch (err) {
+      spinner.fail('Failed to revoke token');
+      console.error(formatError((err as Error).message));
+      throw new CliError('');
+    }
+  });
+
+const tokensCommand = new Command('tokens')
+  .description('Manage CLI tokens')
+  .addCommand(tokensListCommand)
+  .addCommand(tokensRevokeCommand);
+
 export const authCommand = new Command('auth')
   .description('Manage authentication with Apophenic platform')
   .addCommand(loginCommand)
   .addCommand(logoutCommand)
-  .addCommand(statusCommand);
+  .addCommand(statusCommand)
+  .addCommand(tokensCommand);
