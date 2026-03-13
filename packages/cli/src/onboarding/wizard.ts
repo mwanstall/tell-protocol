@@ -5,7 +5,6 @@ import { box, section } from '../output/box.js';
 import { symbols, signalSymbol } from '../output/symbols.js';
 import { truncate, formatSuccess } from '../output/format.js';
 import { nextSteps } from '../output/hints.js';
-import { parseHorizon } from '../utils/parse-horizon.js';
 
 interface WizardAssumption {
   id: string;
@@ -69,17 +68,10 @@ export async function runOnboardingWizard(store: FileStore): Promise<void> {
       ],
     });
 
-    const horizonInput = await input({
-      message: 'Time horizon (e.g. 6m, 12m, 2y — or leave empty to skip)',
-      default: '',
-    });
-
     const owner = await input({
       message: 'Owner (or leave empty to skip)',
       default: '',
     });
-
-    const time_horizon = parseHorizon(horizonInput || undefined);
 
     const bet = await store.addBet({
       thesis,
@@ -87,7 +79,6 @@ export async function runOnboardingWizard(store: FileStore): Promise<void> {
       stage: stage === 'skip' ? undefined : stage,
       assumptions: [],
       owner: owner || undefined,
-      time_horizon,
     });
 
     result.bet = { id: bet.id, thesis };
@@ -99,13 +90,13 @@ export async function runOnboardingWizard(store: FileStore): Promise<void> {
       `  ${pc.dim('ID')}     ${pc.bold(bet.id)}`,
       `  ${pc.dim('Thesis')} ${truncate(thesis, 60)}`,
     ];
-    if (time_horizon) betLines.push(`  ${pc.dim('Target')} ${new Date(time_horizon.target).toLocaleDateString()}`);
     console.log(box(betLines, { borderColor: pc.green }));
 
     // ── Assumption Loop ──────────────────────────────────────────
     console.log();
     console.log(`  ${pc.bold('Assumptions are the beliefs that underpin your bet.')}`);
     console.log(`  ${pc.dim('If an assumption fails, the bet is at risk.')}`);
+    console.log(`  ${pc.dim('Tip: Express timelines as assumptions, e.g. "This succeeds by Q3 2027"')}`);
     console.log();
 
     let addMoreAssumptions = await confirm({

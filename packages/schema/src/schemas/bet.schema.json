@@ -27,6 +27,8 @@
     },
     "time_horizon": {
       "type": "object",
+      "deprecated": true,
+      "description": "Deprecated since v0.3. Express timelines as assumptions instead.",
       "properties": {
         "start": { "type": "string", "format": "date-time" },
         "target": { "type": "string", "format": "date-time" }
