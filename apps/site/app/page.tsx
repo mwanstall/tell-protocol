@@ -83,7 +83,7 @@ export default function HomePage() {
         />
 
         <div className="relative mx-auto max-w-6xl px-6 pb-24 pt-28 sm:pb-32 sm:pt-36">
-          <div className="max-w-3xl">
+          <div className="max-w-3xl lg:mx-auto lg:text-center">
             <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-navy-700 bg-navy-900/80 px-4 py-1.5">
               <span className="h-1.5 w-1.5 rounded-full bg-amber-400 animate-pulse-dot" />
               <span className="text-xs font-medium text-navy-300">
@@ -97,19 +97,19 @@ export default function HomePage() {
               <span className="text-amber-400">the data.</span>
             </h1>
 
-            <p className="mt-6 max-w-2xl text-lg leading-relaxed text-navy-300 sm:text-xl">
+            <p className="mt-6 max-w-2xl text-lg leading-relaxed text-navy-300 sm:text-xl lg:mx-auto">
               Tell is an open protocol that turns strategic intent into structured,
               evidence-driven models that your teams and AI agents can actually read.
             </p>
 
-            <div className="mt-8 overflow-hidden rounded-lg border border-navy-700 bg-navy-900/80 p-4">
+            <div className="mt-8 overflow-hidden rounded-lg border border-navy-700 bg-navy-900/80 p-4 lg:mx-auto lg:max-w-lg">
               <code className="text-sm text-navy-300">
                 <span className="text-navy-500">$</span>{' '}
                 <span className="text-amber-400">npm install -g @tell-protocol/cli</span>
               </code>
             </div>
 
-            <div className="mt-6 flex flex-wrap gap-4">
+            <div className="mt-6 flex flex-wrap gap-4 lg:justify-center">
               <Link
                 href="/install"
                 className="glow-amber-sm rounded-lg bg-amber-500 px-6 py-3 text-sm font-semibold text-navy-950 transition-colors hover:bg-amber-400"
