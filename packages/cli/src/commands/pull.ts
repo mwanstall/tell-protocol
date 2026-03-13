@@ -4,8 +4,8 @@ import { writeFile, mkdir } from 'node:fs/promises';
 import { join } from 'node:path';
 import { FileStore } from '../store/file-store.js';
 import { getRemote, extractHost } from '../sync/config.js';
-import { SyncClient } from '../sync/client.js';
-import { ensurePortfolio, formatSuccess, formatError, formatWarning, CliError } from '../output/format.js';
+import { SyncClient, SyncApiError } from '../sync/client.js';
+import { ensurePortfolio, formatError, CliError } from '../output/format.js';
 import { createSpinner } from '../output/spinner.js';
 
 export const pullCommand = new Command('pull')
@@ -74,6 +74,12 @@ export const pullCommand = new Command('pull')
         await writeFile(join(tellDir, 'evidence', `${assumptionId}.jsonl`), lines);
       }
 
+      // Write audit events (append-only JSONL)
+      if (result.audit_events && result.audit_events.length > 0) {
+        const auditLines = result.audit_events.map((ae) => JSON.stringify(ae)).join('\n') + '\n';
+        await writeFile(join(tellDir, 'audit.jsonl'), auditLines);
+      }
+
       // Save version snapshot
       await mkdir(join(tellDir, 'history'), { recursive: true });
       await writeFile(
@@ -83,11 +89,31 @@ export const pullCommand = new Command('pull')
 
       const betCount = result.portfolio.bets.length;
       const evidenceCount = Object.values(result.evidence).reduce((sum, e) => sum + e.length, 0);
+      const auditCount = result.audit_events?.length || 0;
+      const raCount = result.portfolio.bets.reduce((sum, b) => sum + (b.resource_allocations?.length || 0), 0);
+
       spinner.succeed(`Pulled version ${result.version}`);
-      console.log(pc.dim(`  ${betCount} bets, ${evidenceCount} evidence records`));
+      const parts = [`${betCount} bets`, `${evidenceCount} evidence`];
+      if (raCount > 0) parts.push(`${raCount} allocations`);
+      if (auditCount > 0) parts.push(`${auditCount} audit events`);
+      console.log(pc.dim(`  ${parts.join(', ')}`));
     } catch (err) {
       spinner.fail('Pull failed');
-      console.error(formatError((err as Error).message));
+
+      if (err instanceof SyncApiError) {
+        switch (err.code) {
+          case 'auth_expired':
+            console.error(formatError('Authentication expired. Run "tell auth login" to re-authenticate.'));
+            break;
+          case 'portfolio_not_found':
+            console.error(formatError('Portfolio not found on remote, or you no longer have access.'));
+            break;
+          default:
+            console.error(formatError(err.message));
+        }
+      } else {
+        console.error(formatError((err as Error).message));
+      }
       throw new CliError('');
     }
   });

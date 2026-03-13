@@ -1,9 +1,10 @@
-import type { Portfolio, Evidence } from '@tell-protocol/core';
+import type { Portfolio, Evidence, AuditEvent } from '@tell-protocol/core';
 import { getHostToken, extractHost } from './config.js';
 
 export interface SyncPayload {
   portfolio: Portfolio;
   evidence: Record<string, Evidence[]>; // keyed by assumption ID
+  audit_events?: AuditEvent[];
 }
 
 export interface RemotePortfolioInfo {
@@ -16,11 +17,13 @@ export interface PushResult {
   portfolio_id: string;
   version: number;
   created: boolean; // true if this was a first push (new portfolio on remote)
+  warnings?: string[];
 }
 
 export interface PullResult {
   portfolio: Portfolio;
   evidence: Record<string, Evidence[]>;
+  audit_events?: AuditEvent[];
   version: number;
 }
 
@@ -34,6 +37,29 @@ export interface DeviceAuthPollResult {
   status: 'pending' | 'complete' | 'expired';
   token?: string;
   user_email?: string;
+}
+
+export interface TokenInfo {
+  id: string;
+  name: string;
+  last_used_at: string | null;
+  created_at: string;
+  expires_at: string | null;
+}
+
+/** Structured error from sync API */
+export class SyncApiError extends Error {
+  readonly code: string;
+  readonly status: number;
+  readonly details?: unknown;
+
+  constructor(code: string, message: string, status: number, details?: unknown) {
+    super(message);
+    this.name = 'SyncApiError';
+    this.code = code;
+    this.status = status;
+    this.details = details;
+  }
 }
 
 export class SyncClient {
@@ -67,20 +93,31 @@ export class SyncClient {
       },
     });
     if (!res.ok) {
+      // Try to parse structured error response
       const body = await res.text();
-      throw new Error(`API error ${res.status}: ${body}`);
+      try {
+        const parsed = JSON.parse(body);
+        if (parsed.code) {
+          throw new SyncApiError(parsed.code, parsed.error || body, res.status, parsed.details);
+        }
+      } catch (e) {
+        if (e instanceof SyncApiError) throw e;
+      }
+      throw new SyncApiError('unknown', `API error ${res.status}: ${body}`, res.status);
     }
     return res;
   }
 
   /** Push local portfolio + evidence to the remote */
-  async push(payload: SyncPayload, remotePortfolioId?: string): Promise<PushResult> {
+  async push(payload: SyncPayload, remotePortfolioId?: string, force?: boolean): Promise<PushResult> {
     const res = await this.fetch('/api/sync/push', {
       method: 'POST',
       body: JSON.stringify({
         portfolio: payload.portfolio,
         evidence: payload.evidence,
+        audit_events: payload.audit_events,
         remote_portfolio_id: remotePortfolioId,
+        force: force || undefined,
       }),
     });
     return res.json() as Promise<PushResult>;
@@ -96,6 +133,19 @@ export class SyncClient {
   async status(portfolioId: string): Promise<RemotePortfolioInfo> {
     const res = await this.fetch(`/api/sync/status/${portfolioId}`);
     return res.json() as Promise<RemotePortfolioInfo>;
+  }
+
+  // ── Token Management ──
+
+  /** List all CLI tokens for the authenticated user */
+  async listTokens(): Promise<TokenInfo[]> {
+    const res = await this.fetch('/api/auth/tokens');
+    return res.json() as Promise<TokenInfo[]>;
+  }
+
+  /** Revoke a CLI token by ID */
+  async revokeToken(tokenId: string): Promise<void> {
+    await this.fetch(`/api/auth/tokens/${tokenId}`, { method: 'DELETE' });
   }
 
   // ── Device Auth Flow ──
