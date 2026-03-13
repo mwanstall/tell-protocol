@@ -261,9 +261,9 @@ function showWizardSummary(result: WizardResult): void {
   console.log(box(lines, { borderColor: pc.cyan }));
   console.log();
   console.log(nextSteps([
-    'tell status',
-    'tell bet list',
-    'tell risk',
+    'status',
+    'bet list',
+    'risk',
   ]));
   console.log();
 }
