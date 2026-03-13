@@ -161,6 +161,26 @@ const commands = [
     usage: 'tell pull [remote] [--force]',
     description: 'Pull portfolio updates from a remote platform. Compares versions and warns if local is ahead of remote. Use --force to overwrite local changes.',
   },
+  {
+    name: 'tell portfolio list',
+    usage: 'tell portfolio list',
+    description: 'List all portfolios under the current .tell/ directory, marking the active portfolio.',
+  },
+  {
+    name: 'tell portfolio switch',
+    usage: 'tell portfolio switch <name>',
+    description: 'Switch the active portfolio. All subsequent commands will operate on this portfolio.',
+  },
+  {
+    name: 'tell portfolio current',
+    usage: 'tell portfolio current',
+    description: 'Show details of the active portfolio including name, organisation, version, and bet count.',
+  },
+  {
+    name: 'tell portfolio remove',
+    usage: 'tell portfolio remove <name>',
+    description: 'Remove a portfolio. If the removed portfolio was active, automatically switches to another available portfolio.',
+  },
 ]
 
 export default function CLIPage() {
@@ -194,23 +214,65 @@ export default function CLIPage() {
           <p className="mt-2 text-navy-500">
             Running <code className="rounded bg-navy-100 px-1 py-0.5 text-sm text-navy-700">tell init</code> creates
             a <code className="rounded bg-navy-100 px-1 py-0.5 text-sm text-navy-700">.tell/</code> directory
-            designed for clean version control.
+            with support for multiple named portfolios.
           </p>
           <div className="mt-6 overflow-hidden rounded-xl border border-navy-200 bg-navy-950 p-5">
             <pre className="text-sm leading-relaxed text-navy-300">
 {`.tell/
-  portfolio.tell.json        # Portfolio state
-  config.json                # Remote connections (added by tell remote)
-  evidence/
-    asm_xxx.jsonl             # Append-only evidence (one file per assumption)
-  history/
-    v001.tell.json            # Portfolio snapshots per version
-  audit.jsonl                 # Append-only audit log`}
+  active                       # Plain text: active portfolio slug
+  portfolios/
+    acme-corp/
+      portfolio.tell.json      # Portfolio state
+      config.json              # Remote connections
+      evidence/
+        asm_xxx.jsonl           # Append-only evidence per assumption
+      history/
+        v001.tell.json          # Portfolio snapshots per version
+      audit.jsonl               # Append-only audit log
+    mobile-app/
+      portfolio.tell.json
+      ...`}
             </pre>
           </div>
           <p className="mt-4 text-sm text-navy-400">
             Evidence uses JSONL format (one JSON object per line) so that appends produce
-            clean single-line diffs.
+            clean single-line diffs. Legacy single-portfolio layouts are auto-migrated on first access.
+          </p>
+        </div>
+      </section>
+
+      {/* REPL Mode */}
+      <section className="border-b border-navy-200 py-16">
+        <div className="mx-auto max-w-4xl px-6">
+          <h2 className="text-2xl font-bold text-navy-900">
+            Interactive REPL
+          </h2>
+          <p className="mt-2 text-navy-500">
+            Run <code className="rounded bg-navy-100 px-1 py-0.5 text-sm text-navy-700">tell</code> with no
+            arguments to enter interactive REPL mode. The prompt shows the active portfolio name.
+          </p>
+          <div className="mt-6 overflow-hidden rounded-xl border border-navy-200 bg-navy-950 p-5">
+            <pre className="text-sm leading-[1.8] text-navy-300">
+{`$ tell
+  The Tell Protocol CLI — encode strategic intent
+
+  Type a command, or help for available commands. exit to quit.
+
+tell (acme-corp) > status
+  Acme Corp — v7
+  Bets:  2 active
+  Assumptions:  4 (2 holding, 1 pressure, 1 unknown)
+
+tell (acme-corp) > portfolio switch mobile-app
+  ✓ Switched to portfolio "mobile-app"
+
+tell (mobile-app) >`}
+            </pre>
+          </div>
+          <p className="mt-4 text-sm text-navy-400">
+            All commands work the same in REPL mode — omit the{' '}
+            <code className="rounded bg-navy-100 px-1 py-0.5 text-xs text-navy-700">tell</code>{' '}
+            prefix. The guided onboarding wizard runs automatically on first use.
           </p>
         </div>
       </section>
