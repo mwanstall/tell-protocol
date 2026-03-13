@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import TellLogo from './TellLogo'
 
 export default function Footer() {
   return (
@@ -8,9 +9,7 @@ export default function Footer() {
           {/* Brand */}
           <div className="sm:col-span-2 lg:col-span-1">
             <div className="flex items-center gap-2.5">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-navy-900">
-                <span className="text-sm font-bold text-amber-400">T</span>
-              </div>
+              <TellLogo />
               <span className="text-lg font-semibold tracking-tight text-navy-900">
                 Tell
               </span>
