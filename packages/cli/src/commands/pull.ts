@@ -5,7 +5,7 @@ import { join } from 'node:path';
 import { FileStore } from '../store/file-store.js';
 import { getRemote, extractHost } from '../sync/config.js';
 import { SyncClient } from '../sync/client.js';
-import { ensurePortfolio, formatSuccess, formatError, formatWarning } from '../output/format.js';
+import { ensurePortfolio, formatSuccess, formatError, formatWarning, CliError } from '../output/format.js';
 import { createSpinner } from '../output/spinner.js';
 
 export const pullCommand = new Command('pull')
@@ -13,7 +13,7 @@ export const pullCommand = new Command('pull')
   .argument('[remote]', 'Remote name', 'origin')
   .option('-f, --force', 'Overwrite local changes without confirmation')
   .action(async (remoteName: string, opts) => {
-    const tellDir = ensurePortfolio();
+    const tellDir = await ensurePortfolio();
 
     // Resolve remote
     let remote;
@@ -21,12 +21,12 @@ export const pullCommand = new Command('pull')
       remote = await getRemote(tellDir, remoteName);
     } catch {
       console.error(formatError(`Remote "${remoteName}" not found. Run "tell remote add ${remoteName} <url>" first.`));
-      process.exit(1);
+      throw new CliError('');
     }
 
     if (!remote.portfolio_id) {
       console.error(formatError('No remote portfolio linked. Push first with "tell push" to establish the link.'));
-      process.exit(1);
+      throw new CliError('');
     }
 
     const client = new SyncClient(remote.url);
@@ -88,6 +88,6 @@ export const pullCommand = new Command('pull')
     } catch (err) {
       spinner.fail('Pull failed');
       console.error(formatError((err as Error).message));
-      process.exit(1);
+      throw new CliError('');
     }
   });

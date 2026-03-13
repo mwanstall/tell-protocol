@@ -1,7 +1,7 @@
 import { Command } from 'commander';
 import pc from 'picocolors';
 import { addRemote, removeRemote, readTellConfig } from '../sync/config.js';
-import { ensurePortfolio, formatSuccess, formatError } from '../output/format.js';
+import { ensurePortfolio, formatSuccess, formatError, CliError } from '../output/format.js';
 import { symbols } from '../output/symbols.js';
 import { nextSteps } from '../output/hints.js';
 
@@ -10,13 +10,13 @@ const addCommand = new Command('add')
   .argument('<name>', 'Remote name (e.g., "origin")')
   .argument('<url>', 'Platform URL (e.g., "https://app.apophenic.com")')
   .action(async (name: string, url: string) => {
-    const tellDir = ensurePortfolio();
+    const tellDir = await ensurePortfolio();
     try {
       await addRemote(tellDir, name, url);
       console.log(formatSuccess(`Remote "${name}" added: ${url}`));
     } catch (err) {
       console.error(formatError((err as Error).message));
-      process.exit(1);
+      throw new CliError('');
     }
   });
 
@@ -24,20 +24,20 @@ const removeCmd = new Command('remove')
   .description('Remove a remote')
   .argument('<name>', 'Remote name')
   .action(async (name: string) => {
-    const tellDir = ensurePortfolio();
+    const tellDir = await ensurePortfolio();
     try {
       await removeRemote(tellDir, name);
       console.log(formatSuccess(`Remote "${name}" removed`));
     } catch (err) {
       console.error(formatError((err as Error).message));
-      process.exit(1);
+      throw new CliError('');
     }
   });
 
 const listCommand = new Command('list')
   .description('List configured remotes')
   .action(async () => {
-    const tellDir = ensurePortfolio();
+    const tellDir = await ensurePortfolio();
     const config = await readTellConfig(tellDir);
 
     if (config.remotes.length === 0) {

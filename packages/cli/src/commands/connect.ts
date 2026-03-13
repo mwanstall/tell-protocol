@@ -6,8 +6,8 @@ import { box } from '../output/box.js';
 import { symbols } from '../output/symbols.js';
 import type { ConnectionType } from '@tell-protocol/core';
 
-function getStore(): FileStore {
-  const tellDir = ensurePortfolio();
+async function getStore(): Promise<FileStore> {
+  const tellDir = await ensurePortfolio();
   return new FileStore(tellDir);
 }
 
@@ -18,7 +18,7 @@ const addCmd = new Command('add')
   .requiredOption('--type <type>', 'Connection type: tension, synergy, dependency, resource_conflict')
   .argument('<description>', 'Description of the relationship')
   .action(async (betA, betB, description, opts) => {
-    const store = getStore();
+    const store = await getStore();
     const conn = await store.addConnection({
       type: opts.type as ConnectionType,
       bet_ids: [betA, betB],
@@ -39,7 +39,7 @@ const addCmd = new Command('add')
 const listCmd = new Command('list')
   .description('List all connections')
   .action(async () => {
-    const store = getStore();
+    const store = await getStore();
     const connections = await store.getConnections();
 
     if (connections.length === 0) {

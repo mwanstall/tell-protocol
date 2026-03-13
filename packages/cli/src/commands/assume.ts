@@ -6,8 +6,8 @@ import { box } from '../output/box.js';
 import { symbols } from '../output/symbols.js';
 import { nextSteps } from '../output/hints.js';
 
-function getStore(): FileStore {
-  const tellDir = ensurePortfolio();
+async function getStore(): Promise<FileStore> {
+  const tellDir = await ensurePortfolio();
   return new FileStore(tellDir);
 }
 
@@ -17,7 +17,7 @@ const addCmd = new Command('add')
   .argument('<statement>', 'Testable assumption statement')
   .option('--threshold <threshold>', 'Evidence threshold description')
   .action(async (betId, statement, opts) => {
-    const store = getStore();
+    const store = await getStore();
     const assumption = await store.addAssumption(betId, {
       statement,
       evidence_threshold: opts.threshold,
@@ -42,7 +42,7 @@ const listCmd = new Command('list')
   .description('List assumptions for a bet')
   .argument('<bet-id>', 'Bet ID')
   .action(async (betId) => {
-    const store = getStore();
+    const store = await getStore();
     const assumptions = await store.getAssumptionsForBet(betId);
 
     if (assumptions.length === 0) {
@@ -65,7 +65,7 @@ const linkCmd = new Command('link')
   .argument('<assumption-id>', 'Assumption ID')
   .argument('<bet-id>', 'Target bet ID')
   .action(async (assumptionId, betId) => {
-    const store = getStore();
+    const store = await getStore();
     await store.linkAssumptionToBet(assumptionId, betId);
     console.log(formatSuccess(`Assumption ${pc.bold(assumptionId)} ${symbols.arrow} bet ${pc.bold(betId)}`));
   });

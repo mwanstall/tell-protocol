@@ -6,8 +6,8 @@ import { box } from '../output/box.js';
 import { symbols, signalSymbol } from '../output/symbols.js';
 import type { SignalDirection, SignalConfidence } from '@tell-protocol/core';
 
-function getStore(): FileStore {
-  const tellDir = ensurePortfolio();
+async function getStore(): Promise<FileStore> {
+  const tellDir = await ensurePortfolio();
   return new FileStore(tellDir);
 }
 
@@ -20,7 +20,7 @@ const addCmd = new Command('add')
   .option('--source <type>', 'Source type: human, ai_curated, agent', 'human')
   .option('--ref <uri>', 'Data reference URI')
   .action(async (assumptionId, summary, opts) => {
-    const store = getStore();
+    const store = await getStore();
 
     const evidence = await store.appendEvidence({
       assumption_ids: [assumptionId],
@@ -51,7 +51,7 @@ const listCmd = new Command('list')
   .description('List evidence for an assumption')
   .argument('<assumption-id>', 'Assumption ID')
   .action(async (assumptionId) => {
-    const store = getStore();
+    const store = await getStore();
     const evidence = await store.getEvidence(assumptionId);
 
     if (evidence.length === 0) {

@@ -5,7 +5,7 @@ import { FileStore } from '../store/file-store.js';
 import { getRemote, setRemotePortfolioId, extractHost } from '../sync/config.js';
 import { SyncClient } from '../sync/client.js';
 import type { SyncPayload } from '../sync/client.js';
-import { ensurePortfolio, formatSuccess, formatError } from '../output/format.js';
+import { ensurePortfolio, formatSuccess, formatError, CliError } from '../output/format.js';
 import { createSpinner } from '../output/spinner.js';
 import { symbols } from '../output/symbols.js';
 
@@ -13,7 +13,7 @@ export const pushCommand = new Command('push')
   .description('Push this portfolio to a remote platform')
   .argument('[remote]', 'Remote name', 'origin')
   .action(async (remoteName: string) => {
-    const tellDir = ensurePortfolio();
+    const tellDir = await ensurePortfolio();
 
     // Resolve remote
     let remote;
@@ -21,7 +21,7 @@ export const pushCommand = new Command('push')
       remote = await getRemote(tellDir, remoteName);
     } catch {
       console.error(formatError(`Remote "${remoteName}" not found. Run "tell remote add ${remoteName} <url>" first.`));
-      process.exit(1);
+      throw new CliError('');
     }
 
     const store = new FileStore(tellDir);
@@ -65,6 +65,6 @@ export const pushCommand = new Command('push')
     } catch (err) {
       spinner.fail('Push failed');
       console.error(formatError((err as Error).message));
-      process.exit(1);
+      throw new CliError('');
     }
   });

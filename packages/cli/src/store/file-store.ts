@@ -1,6 +1,7 @@
-import { readFile, writeFile, mkdir, readdir } from 'node:fs/promises';
+import { readFile, writeFile, mkdir, readdir, rename, rm } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
-import { join } from 'node:path';
+import { join, basename } from 'node:path';
+import { slugify } from '../utils/slugify.js';
 import type { TellStore } from '@tell-protocol/core';
 import type {
   Portfolio,
@@ -359,12 +360,23 @@ export class FileStore implements TellStore {
     return portfolio.version;
   }
 
-  // Initialization
+  // Initialization — creates a named portfolio under .tell/portfolios/<slug>/
   static async init(dir: string, name: string, organisation: string): Promise<FileStore> {
-    const tellDir = join(dir, '.tell');
-    await mkdir(tellDir, { recursive: true });
-    await mkdir(join(tellDir, 'evidence'), { recursive: true });
-    await mkdir(join(tellDir, 'history'), { recursive: true });
+    const rootTellDir = join(dir, '.tell');
+    const slug = slugify(name);
+
+    if (!slug) throw new Error('Portfolio name must contain at least one alphanumeric character.');
+
+    const portfolioDir = join(rootTellDir, 'portfolios', slug);
+
+    // Check for slug collision
+    if (existsSync(join(portfolioDir, 'portfolio.tell.json'))) {
+      throw new Error(`A portfolio named "${slug}" already exists.`);
+    }
+
+    await mkdir(portfolioDir, { recursive: true });
+    await mkdir(join(portfolioDir, 'evidence'), { recursive: true });
+    await mkdir(join(portfolioDir, 'history'), { recursive: true });
 
     const now = nowISO();
     const portfolio: Portfolio = {
@@ -387,20 +399,168 @@ export class FileStore implements TellStore {
       ],
     };
 
-    const store = new FileStore(tellDir);
+    const store = new FileStore(portfolioDir);
     await store.writePortfolio(portfolio);
-    await writeFile(join(tellDir, 'history', 'v001.tell.json'), JSON.stringify(portfolio, null, 2));
+    await writeFile(join(portfolioDir, 'history', 'v001.tell.json'), JSON.stringify(portfolio, null, 2));
+
+    // Set as active portfolio
+    await setActivePortfolio(rootTellDir, slug);
+
     return store;
   }
 }
 
-export function resolveTellDir(startDir: string = process.cwd()): string | null {
+// ── Multi-portfolio resolution ──────────────────────────────────
+
+/**
+ * Find the root `.tell/` directory by walking up from startDir.
+ * Accepts both legacy layout (portfolio.tell.json at root) and
+ * multi-portfolio layout (portfolios/ subfolder).
+ */
+export function resolveRootTellDir(startDir: string = process.cwd()): string | null {
   let dir = startDir;
   while (true) {
     const tellDir = join(dir, '.tell');
+    // Multi-portfolio layout
+    if (existsSync(join(tellDir, 'portfolios'))) return tellDir;
+    // Legacy layout
     if (existsSync(join(tellDir, 'portfolio.tell.json'))) return tellDir;
     const parent = join(dir, '..');
     if (parent === dir) return null;
     dir = parent;
   }
+}
+
+/**
+ * Check if a root .tell/ directory uses the legacy single-portfolio layout.
+ */
+export function isLegacyLayout(rootTellDir: string): boolean {
+  return existsSync(join(rootTellDir, 'portfolio.tell.json'))
+    && !existsSync(join(rootTellDir, 'portfolios'));
+}
+
+/**
+ * Migrate a legacy .tell/ to multi-portfolio layout.
+ * Moves all files into .tell/portfolios/default/.
+ */
+export async function migrateLegacyLayout(rootTellDir: string): Promise<void> {
+  const defaultDir = join(rootTellDir, 'portfolios', 'default');
+  await mkdir(defaultDir, { recursive: true });
+
+  // Move known files/dirs into the default portfolio
+  const items = ['portfolio.tell.json', 'config.json', 'audit.jsonl', 'evidence', 'history'];
+  for (const item of items) {
+    const src = join(rootTellDir, item);
+    if (existsSync(src)) {
+      await rename(src, join(defaultDir, item));
+    }
+  }
+
+  // Write active file
+  await setActivePortfolio(rootTellDir, 'default');
+}
+
+/**
+ * Read the name of the currently active portfolio.
+ */
+export async function getActivePortfolioName(rootTellDir: string): Promise<string | null> {
+  const activePath = join(rootTellDir, 'active');
+  if (!existsSync(activePath)) return null;
+  const name = (await readFile(activePath, 'utf-8')).trim();
+  return name || null;
+}
+
+/**
+ * Set the active portfolio by writing the slug to .tell/active.
+ */
+export async function setActivePortfolio(rootTellDir: string, slug: string): Promise<void> {
+  await writeFile(join(rootTellDir, 'active'), slug);
+}
+
+/**
+ * List all portfolio slugs under .tell/portfolios/.
+ */
+export async function listPortfolios(rootTellDir: string): Promise<string[]> {
+  const portfoliosDir = join(rootTellDir, 'portfolios');
+  if (!existsSync(portfoliosDir)) return [];
+  const entries = await readdir(portfoliosDir, { withFileTypes: true });
+  return entries
+    .filter((e) => e.isDirectory() && existsSync(join(portfoliosDir, e.name, 'portfolio.tell.json')))
+    .map((e) => e.name);
+}
+
+/**
+ * Remove a portfolio by slug.
+ */
+export async function removePortfolio(rootTellDir: string, slug: string): Promise<void> {
+  const portfolioDir = join(rootTellDir, 'portfolios', slug);
+  if (!existsSync(join(portfolioDir, 'portfolio.tell.json'))) {
+    throw new Error(`Portfolio "${slug}" not found.`);
+  }
+  await rm(portfolioDir, { recursive: true, force: true });
+
+  // If the removed portfolio was active, switch to another or clear
+  const active = await getActivePortfolioName(rootTellDir);
+  if (active === slug) {
+    const remaining = await listPortfolios(rootTellDir);
+    if (remaining.length > 0) {
+      await setActivePortfolio(rootTellDir, remaining[0]);
+    } else {
+      await writeFile(join(rootTellDir, 'active'), '');
+    }
+  }
+}
+
+/**
+ * Resolve the active portfolio's directory path.
+ * Handles legacy migration automatically.
+ * Returns the path to the active portfolio dir (equivalent to the old .tell/ path).
+ */
+export async function resolveActivePortfolioDir(startDir: string = process.cwd()): Promise<string | null> {
+  const rootTellDir = resolveRootTellDir(startDir);
+  if (!rootTellDir) return null;
+
+  // Legacy layout — auto-migrate
+  if (isLegacyLayout(rootTellDir)) {
+    await migrateLegacyLayout(rootTellDir);
+    console.error('  Migrated portfolio to .tell/portfolios/default/');
+  }
+
+  const activeName = await getActivePortfolioName(rootTellDir);
+  if (!activeName) return null;
+
+  const portfolioDir = join(rootTellDir, 'portfolios', activeName);
+  if (!existsSync(join(portfolioDir, 'portfolio.tell.json'))) return null;
+
+  return portfolioDir;
+}
+
+/**
+ * Backward-compatible alias for resolveActivePortfolioDir.
+ * Used by MCP server's import of resolveTellDir.
+ *
+ * Note: This is now async (returns Promise<string | null>).
+ * For synchronous callers that need the old behavior, use resolveRootTellDir.
+ */
+export function resolveTellDir(startDir: string = process.cwd()): string | null {
+  // Synchronous fallback for backward compat (MCP server, etc.)
+  // Checks multi-portfolio first, then legacy
+  const rootTellDir = resolveRootTellDir(startDir);
+  if (!rootTellDir) return null;
+
+  // Multi-portfolio: read active file synchronously
+  const activePath = join(rootTellDir, 'active');
+  if (existsSync(activePath)) {
+    const { readFileSync } = require('node:fs');
+    const activeName = (readFileSync(activePath, 'utf-8') as string).trim();
+    if (activeName) {
+      const portfolioDir = join(rootTellDir, 'portfolios', activeName);
+      if (existsSync(join(portfolioDir, 'portfolio.tell.json'))) return portfolioDir;
+    }
+  }
+
+  // Legacy layout (not yet migrated)
+  if (existsSync(join(rootTellDir, 'portfolio.tell.json'))) return rootTellDir;
+
+  return null;
 }

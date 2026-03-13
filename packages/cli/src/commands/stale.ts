@@ -10,7 +10,7 @@ export const staleCommand = new Command('stale')
   .description('Find stale assumptions lacking recent evidence')
   .option('-d, --days <days>', 'Staleness threshold in days', '14')
   .action(async (opts) => {
-    const tellDir = ensurePortfolio();
+    const tellDir = await ensurePortfolio();
     const store = new FileStore(tellDir);
     const portfolio = await store.getPortfolio();
     const threshold = parseInt(opts.days);

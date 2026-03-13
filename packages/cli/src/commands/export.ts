@@ -8,7 +8,7 @@ export const exportCommand = new Command('export')
   .description('Export the portfolio as a .tell.json file')
   .option('-o, --output <file>', 'Output file path', 'portfolio.tell.json')
   .action(async (opts) => {
-    const tellDir = ensurePortfolio();
+    const tellDir = await ensurePortfolio();
     const store = new FileStore(tellDir);
     const portfolio = await store.getPortfolio();
     const json = serialize(portfolio);

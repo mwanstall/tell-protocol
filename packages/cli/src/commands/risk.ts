@@ -9,7 +9,7 @@ import { symbols } from '../output/symbols.js';
 export const riskCommand = new Command('risk')
   .description('Portfolio risk assessment')
   .action(async () => {
-    const tellDir = ensurePortfolio();
+    const tellDir = await ensurePortfolio();
     const store = new FileStore(tellDir);
     const portfolio = await store.getPortfolio();
     const risk = assessRisk(portfolio);
