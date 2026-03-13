@@ -118,11 +118,10 @@ export default function AboutPage() {
               structure client engagements using Tell.
             </p>
             <p>
-              Each of these implementations validates the standard and expands
-              the ecosystem. Apophenic is where the full Level 3 Platform
-              experience lives — real-time events, version history, scenario
-              modelling, AI-powered intelligence — but the protocol itself is
-              open for anyone to implement.
+              Apophenic is where the full Level 3 Platform experience lives —
+              real-time events, version history, scenario modelling, AI-powered
+              intelligence — but the protocol itself is open for anyone to
+              implement.
             </p>
           </div>
         </section>
@@ -142,7 +141,7 @@ export default function AboutPage() {
                 {
                   version: 'v0.2',
                   title: 'Expanded Specification',
-                  status: 'current',
+                  status: 'complete',
                   desc: 'Full entity schemas, conformance levels, MCP integration patterns, evidence weighting algorithm.',
                 },
                 {
@@ -153,9 +152,9 @@ export default function AboutPage() {
                 },
                 {
                   version: 'v0.4',
-                  title: 'Schema Refinement',
-                  status: 'planned',
-                  desc: 'Refinements from real-world usage. Edge case handling. Extension ecosystem patterns.',
+                  title: 'Multi-Portfolio & Cloud Sync',
+                  status: 'current',
+                  desc: 'Multiple named portfolios under .tell/, interactive REPL mode, cloud sync (push/pull), portfolio management commands. CLI v0.4.1.',
                 },
                 {
                   version: 'v1.0',
@@ -165,7 +164,6 @@ export default function AboutPage() {
                 },
               ].map((item) => (
                 <div key={item.version} className="relative pb-8 last:pb-0">
-                  {/* Dot */}
                   <div
                     className={`absolute -left-[calc(2rem+5px)] flex h-3 w-3 rounded-full ${
                       item.status === 'current'
@@ -208,50 +206,17 @@ export default function AboutPage() {
           </div>
         </section>
 
-        {/* Governance */}
-        <section className="mb-16">
-          <h2 className="text-2xl font-bold text-navy-900">Governance</h2>
-          <div className="mt-4 space-y-4 text-navy-600">
-            <p>
-              Tell is currently developed and maintained by{' '}
-              <a
-                href="https://apophenic.tech"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-amber-600 underline underline-offset-2 hover:text-amber-500"
-              >
-                Apophenic
-              </a>
-              . As the protocol matures and gains external implementors, the goal
-              is to transition governance to a community-driven model.
-            </p>
-            <p>
-              The specification, JSON schemas, and reference implementations are
-              published openly as{' '}
-              <a
-                href="https://www.npmjs.com/org/tell-protocol"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-amber-600 underline underline-offset-2 hover:text-amber-500"
-              >
-                @tell-protocol npm packages
-              </a>
-              . Feedback and contributions are welcome.
-            </p>
-          </div>
-        </section>
-
         {/* CTA */}
         <section className="rounded-xl border-2 border-navy-200 bg-navy-950 p-8 text-center">
           <h3 className="text-xl font-bold text-white">Ready to build?</h3>
           <p className="mx-auto mt-2 max-w-md text-sm text-navy-400">
             Start with the specification, explore the getting started guide, or
-            try Apophenic — the canonical platform implementation.
+            install the CLI.
           </p>
           <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
             <Link
               href="/spec"
-              className="rounded-lg bg-amber-500 px-5 py-2.5 text-sm font-semibold text-navy-950 transition-colors hover:bg-amber-400"
+              className="glow-amber-sm rounded-lg bg-amber-500 px-5 py-2.5 text-sm font-semibold text-navy-950 transition-colors hover:bg-amber-400"
             >
               Read the Spec
             </Link>

@@ -29,7 +29,7 @@ export default function Header() {
         </Link>
 
         {/* Desktop nav */}
-        <nav className="hidden items-center gap-8 md:flex">
+        <nav className="hidden items-center gap-8 lg:flex">
           {navItems.map((item) => (
             <Link
               key={item.href}
@@ -50,7 +50,7 @@ export default function Header() {
         {/* Mobile hamburger */}
         <button
           onClick={() => setMobileOpen(!mobileOpen)}
-          className="flex h-10 w-10 items-center justify-center rounded-lg text-navy-600 transition-colors hover:bg-navy-100 md:hidden"
+          className="flex h-10 w-10 items-center justify-center rounded-lg text-navy-600 transition-colors hover:bg-navy-100 lg:hidden"
           aria-label="Toggle menu"
         >
           {mobileOpen ? (
@@ -67,7 +67,7 @@ export default function Header() {
 
       {/* Mobile menu */}
       {mobileOpen && (
-        <div className="border-t border-navy-200 bg-white px-6 py-4 md:hidden">
+        <div className="border-t border-navy-200 bg-white px-6 py-4 lg:hidden">
           <nav className="flex flex-col gap-3">
             {navItems.map((item) => (
               <Link
